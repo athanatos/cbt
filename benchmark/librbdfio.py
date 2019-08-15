@@ -178,7 +178,7 @@ class LibrbdFio(Benchmark):
             fio_cmd += ' --rate_iops=%s' % self.rate_iops
 
         # End the fio_cmd
-        fio_cmd += ' %s > %s' % (self.names, out_file)
+        fio_cmd += ' %s > %s 2>&1' % (self.names, out_file)
         return fio_cmd
 
     def mkimages(self):
