@@ -89,3 +89,26 @@ class Benchmark(object):
 
     def __str__(self):
         return str(self.config)
+
+    @staticmethod
+    def generate_all_configs(config):
+        """
+        return all parameter combinations for config
+        config: dict - list of params
+        iterate over all top-level lists in config
+        """
+        cycle_over_lists = []
+        cycle_over_names = []
+        default = {}
+
+        for param, value in config.iteritems():
+            if isinstance(value, list):
+                cycle_over_lists.append(value)
+                cycle_over_names.append(param)
+            else:
+                default[param] = value
+
+        for permutation in itertools.product(*cycle_over_lists):
+            current = copy.deepcopy(default)
+            current.update(zip(cycle_over_names, permutation))
+            yield current

@@ -15,53 +15,32 @@ from benchmark.getput import Getput
 
 def get_all(cluster, iteration):
     for benchmark, config in sorted(settings.benchmarks.iteritems()):
+        constructor = get_constructor(benchmark)
         default = {"benchmark": benchmark,
                    "iteration": iteration}
-        for current in all_configs(config):
+        for current in constructor.generate_all_configs(config):
             current.update(default)
-            yield get_object(cluster, benchmark, current)
+            yield constructor(cluster, benchmark, current)
 
-
-def all_configs(config):
-    """
-    return all parameter combinations for config
-    config: dict - list of params
-    iterate over all top-level lists in config
-    """
-    cycle_over_lists = []
-    cycle_over_names = []
-    default = {}
-
-    for param, value in config.iteritems():
-        if isinstance(value, list):
-            cycle_over_lists.append(value)
-            cycle_over_names.append(param)
-        else:
-            default[param] = value
-
-    for permutation in itertools.product(*cycle_over_lists):
-        current = copy.deepcopy(default)
-        current.update(zip(cycle_over_names, permutation))
-        yield current
 
 def get_object(cluster, benchmark, bconfig):
     if benchmark == "nullbench":
-        return Nullbench(cluster, bconfig)
+        return Nullbench
     if benchmark == "radosbench":
-        return Radosbench(cluster, bconfig)
+        return Radosbench
     if benchmark == "fio":
-        return Fio(cluster, bconfig)
+        return Fio
     if benchmark == "rbdfio":
-        return RbdFio(cluster, bconfig)
+        return RbdFio
     if benchmark == "kvmrbdfio":
-        return KvmRbdFio(cluster, bconfig)
+        return KvmRbdFio
     if benchmark == "rawfio":
-        return RawFio(cluster, bconfig)
+        return RawFio
     if benchmark == 'librbdfio':
-        return LibrbdFio(cluster, bconfig)
+        return LibrbdFio
     if benchmark == 'cosbench':
-        return Cosbench(cluster, bconfig)
+        return Cosbench
     if benchmark == 'cephtestrados':
-        return CephTestRados(cluster, bconfig)
+        return CephTestRados
     if benchmark == 'getput':
-        return Getput(cluster, bconfig)
+        return Getput
