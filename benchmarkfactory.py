@@ -1,7 +1,7 @@
-import copy
 import itertools
 
 import settings
+from benchmark.concurrent import Concurrent
 from benchmark.radosbench import Radosbench
 from benchmark.fio import Fio
 from benchmark.rbdfio import RbdFio
@@ -15,15 +15,15 @@ from benchmark.getput import Getput
 
 def get_all(cluster, iteration):
     for benchmark, config in sorted(settings.benchmarks.iteritems()):
-        constructor = get_constructor(benchmark)
+        constructor = get_object(benchmark)
         default = {"benchmark": benchmark,
                    "iteration": iteration}
         for current in constructor.generate_all_configs(config):
             current.update(default)
-            yield constructor(cluster, benchmark, current)
+            yield constructor(cluster, current)
 
 
-def get_object(cluster, benchmark, bconfig):
+def get_object(benchmark):
     if benchmark == "nullbench":
         return Nullbench
     if benchmark == "radosbench":
@@ -44,3 +44,5 @@ def get_object(cluster, benchmark, bconfig):
         return CephTestRados
     if benchmark == 'getput':
         return Getput
+    if benchmark == 'concurrent':
+        return Concurrent

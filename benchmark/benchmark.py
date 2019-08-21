@@ -7,6 +7,9 @@ import monitoring
 import hashlib
 import os
 import yaml
+import itertools
+import copy
+import json
 
 logger = logging.getLogger('cbt')
 
@@ -15,10 +18,20 @@ class Benchmark(object):
         self.config = config
         self.cluster = cluster
 #        self.cluster = Ceph(settings.cluster)
-        self.archive_dir = "%s/%s/%08d/%s%s" % (settings.cluster.get('archive_dir'),
-                                                "results", config.get('iteration'), "id",
-                                                hash(frozenset((self.config).items())))
-        self.run_dir = "%s/%08d/%s" % (settings.cluster.get('tmp_dir'), config.get('iteration'), self.getclass())
+        self.concurrent_id = config.get('concurrent_id', 0)
+        self.archive_dir = "%s/%s/%08d/%04d/%s%s" % (
+            settings.cluster.get('archive_dir'),
+            "results",
+            config.get('iteration'),
+            self.concurrent_id,
+            "id",
+            hash(json.dumps(
+                self.config, sort_keys=True)))
+        self.run_dir = "%s/%08d/%04d/%s" % (
+            settings.cluster.get('tmp_dir'),
+            config.get('iteration'),
+            self.concurrent_id,
+            self.getclass())
         self.osd_ra = config.get('osd_ra', None)
         self.cmd_path = ''
         self.valgrind = config.get('valgrind', None)

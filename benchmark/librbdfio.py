@@ -46,7 +46,7 @@ class LibrbdFio(Benchmark):
         self.data_pool = None 
         # use_existing_volumes needs to be true to set the pool and rbd names
         self.use_existing_volumes = config.get('use_existing_volumes', False)
-        self.pool_name = config.get("poolname", "cbt-librbdfio")
+        self.pool_name = config.get("poolname", "cbt-librbdfio-%d")
         self.rbdname = config.get('rbdname', '')
 
 	self.total_procs = self.procs_per_volume * self.volumes_per_client * len(settings.getnodes('clients').split(','))
@@ -57,7 +57,10 @@ class LibrbdFio(Benchmark):
         # Make the file names string (repeated across volumes)
         self.names = ''
         for proc_num in xrange(self.procs_per_volume):
-            rbd_name = 'cbt-librbdfio-`%s`-file-%d' % (common.get_fqdn_cmd(), proc_num)
+            rbd_name = 'cbt-librbdfio-`%s`-file-%d-%d' % (
+                common.get_fqdn_cmd(),
+                self.concurrent_id,
+                proc_num)
             self.names += '--name=%s ' % rbd_name
 
     def exists(self):
