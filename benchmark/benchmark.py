@@ -18,19 +18,24 @@ class Benchmark(object):
         self.config = config
         self.cluster = cluster
 #        self.cluster = Ceph(settings.cluster)
-        self.concurrent_id = config.get('concurrent_id', 0)
-        self.archive_dir = "%s/%s/%08d/%04d/%s%s" % (
+        self.concurrent_id = config.get('concurrent_id/', None)
+        concurrent_id_segment = ''
+        if self.concurrent_id:
+            concurrent_id_segment = '%04d' % (self.concurrent_id,)
+
+        self.archive_dir = "%s/%s/%08d/%s%s%s" % (
             settings.cluster.get('archive_dir'),
             "results",
             config.get('iteration'),
-            self.concurrent_id,
+            concurrent_id_segment,
             "id",
             hash(json.dumps(
                 self.config, sort_keys=True)))
-        self.run_dir = "%s/%08d/%04d/%s" % (
+
+        self.run_dir = "%s/%08d/%s%s" % (
             settings.cluster.get('tmp_dir'),
             config.get('iteration'),
-            self.concurrent_id,
+            concurrent_id_segment,
             self.getclass())
         self.osd_ra = config.get('osd_ra', None)
         self.cmd_path = ''
