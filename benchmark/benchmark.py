@@ -20,7 +20,7 @@ class Benchmark(object):
 #        self.cluster = Ceph(settings.cluster)
         self.concurrent_id = config.get('concurrent_id', None)
         concurrent_id_segment = ''
-        if self.concurrent_id:
+        if self.concurrent_id is not None:
             concurrent_id_segment = '%04d/' % (self.concurrent_id,)
 
         self.archive_dir = "%s/%s/%08d/%s%s%s" % (
