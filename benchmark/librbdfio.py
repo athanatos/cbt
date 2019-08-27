@@ -21,6 +21,7 @@ class LibrbdFio(Benchmark):
 
         # FIXME there are too many permutations, need to put results in SQLITE3 
         self.cmd_path = config.get('cmd_path', '/usr/bin/fio')
+        self.client_name = config.get('client_name', 'admin')
         self.pool_profile = config.get('pool_profile', 'default')
         self.data_pool_profile = config.get('data_pool_profile', None)
         self.time =  str(config.get('time', None))
@@ -144,7 +145,7 @@ class LibrbdFio(Benchmark):
         logger.debug('Using rbdname %s', rbdname)
         out_file = '%s/output.%d' % (self.run_dir, volnum)
 
-        fio_cmd = 'sudo %s --ioengine=rbd --clientname=admin --pool=%s --rbdname=%s --invalidate=0' % (self.cmd_path_full, self.pool_name, rbdname)
+        fio_cmd = 'sudo %s --ioengine=rbd --clientname=%s --pool=%s --rbdname=%s --invalidate=0' % (self.cmd_path_full, self.client_name, self.pool_name, rbdname)
         fio_cmd += ' --rw=%s' % self.mode
         fio_cmd += ' --output-format=%s' % self.fio_out_format
         if (self.mode == 'readwrite' or self.mode == 'randrw'):
