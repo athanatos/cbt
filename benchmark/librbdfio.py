@@ -144,7 +144,7 @@ class LibrbdFio(Benchmark):
         if self.use_existing_volumes and len(self.rbdname):
             rbdname = self.rbdname
         else:
-            rbd_name = 'cbt-librbdfio-`%s`%s-%d' % (common.get_fqdn_cmd(), self.concurrent_suffix, volnum)
+            rbdname = 'cbt-librbdfio-`%s`%s-%d' % (common.get_fqdn_cmd(), self.concurrent_suffix, volnum)
 
         logger.debug('Using rbdname %s', rbdname)
         out_file = '%s/output.%d' % (self.run_dir, volnum)
