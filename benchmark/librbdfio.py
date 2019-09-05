@@ -19,6 +19,10 @@ class LibrbdFio(Benchmark):
     def __init__(self, cluster, config):
         super(LibrbdFio, self).__init__(cluster, config)
 
+        self.concurrent_suffix = ''
+        if 'concurrent_id' in config:
+            self.concurrent_suffix = "-{}".format(config.get('concurrent_id'))
+
         # FIXME there are too many permutations, need to put results in SQLITE3 
         self.cmd_path = config.get('cmd_path', '/usr/bin/fio')
         self.client_name = config.get('client_name', 'admin')
@@ -47,7 +51,7 @@ class LibrbdFio(Benchmark):
         self.data_pool = None 
         # use_existing_volumes needs to be true to set the pool and rbd names
         self.use_existing_volumes = config.get('use_existing_volumes', False)
-        self.pool_name = config.get("poolname", "cbt-librbdfio-%d")
+        self.pool_name = config.get("poolname", "cbt-librbdfio")
         self.rbdname = config.get('rbdname', '')
 
 	self.total_procs = self.procs_per_volume * self.volumes_per_client * len(settings.getnodes('clients').split(','))
@@ -91,7 +95,7 @@ class LibrbdFio(Benchmark):
         logger.info('Attempting to populating fio files...')
         if (self.use_existing_volumes == False):
           for volnum in xrange(self.volumes_per_client):
-              rbd_name = 'cbt-librbdfio-`%s`-%d' % (common.get_fqdn_cmd(), volnum)
+              rbd_name = 'cbt-librbdfio-`%s`%s-%d' % (common.get_fqdn_cmd(), self.concurrent_suffix, volnum)
               pre_cmd = 'sudo %s --ioengine=rbd --clientname=admin --pool=%s --rbdname=%s --invalidate=0  --rw=write --numjobs=%s --bs=4M --size %dM %s --output-format=%s > /dev/null' % (self.cmd_path, self.pool_name, rbd_name, self.numjobs, self.vol_size, self.names, self.fio_out_format)
               p = common.pdsh(settings.getnodes('clients'), pre_cmd)
               ps.append(p)
