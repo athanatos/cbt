@@ -201,7 +201,7 @@ class LibrbdFio(Benchmark):
           for node in common.get_fqdn_list('clients'):
               for volnum in xrange(0, self.volumes_per_client):
                   node = node.rpartition("@")[2]
-                  self.cluster.mkimage('cbt-librbdfio-%s-%s%d' % (node,self.concurrent_suffix,volnum), self.vol_size, self.pool_name, self.data_pool, self.vol_object_size)
+                  self.cluster.mkimage('cbt-librbdfio-%s%s-%d' % (node,self.concurrent_suffix,volnum), self.vol_size, self.pool_name, self.data_pool, self.vol_object_size)
         monitoring.stop()
 
     def recovery_callback(self): 
