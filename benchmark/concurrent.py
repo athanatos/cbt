@@ -18,6 +18,7 @@ class Concurrent(Benchmark):
             ret.update(specific)
             ret['iteration'] = config['iteration']
             ret['concurrent_id'] = i
+            ret['use_existing'] = True
             return ret
 
         self.benchmarks = [
