@@ -52,7 +52,7 @@ class LibrbdFio(Benchmark):
         # use_existing_volumes needs to be true to set the pool and rbd names
         self.use_existing_volumes = config.get('use_existing_volumes', False)
 
-        self.pool_name = 'cbt-librbdfio' + self.concurrent_suffiz
+        self.pool_name = 'cbt-librbdfio' + self.concurrent_suffix
         if 'poolname' in config:
             self.pool_name = config.get('poolname')
 
