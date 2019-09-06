@@ -62,7 +62,7 @@ class Benchmark(object):
         return self.__class__.__name__
 
     def initialize(self):
-        if not self.cluster.use_existing:
+        if not self.cluster.use_existing and not self.cluster.initialized:
             self.cluster.cleanup()
             self.cluster.initialize()
         self.cleanup()
