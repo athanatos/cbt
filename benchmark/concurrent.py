@@ -13,23 +13,18 @@ class Concurrent(Benchmark):
     def __init__(self, cluster, config):
         super(Concurrent, self).__init__(cluster, config)
 
-        def merge_config(cluster, shared, specific, i):
+        def merge_config(shared, specific, i):
             ret = copy.deepcopy(shared)
             ret.update(specific)
             ret['iteration'] = config['iteration']
             ret['concurrent_id'] = i
-
-            cret = cluster.deepcopy(cluster)
-            cret['use_existing'] = True
-            return cret, ret
+            return ret
 
         self.benchmarks = [
             benchmarkfactory.get_object(c.get('benchmark'))(
-                *merge_config(
-                    cluster,
-                    config.get('shared', {}),
-                    c.get('config', {}),
-                    i))
+                cluster, merge_config(config.get('shared', {}),
+                                      c.get('config', {}),
+                                      i))
             for i, c in zip(
                     itertools.count(0), config.get('benchmarks', []))]
 

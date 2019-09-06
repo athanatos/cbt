@@ -107,6 +107,7 @@ class Ceph(Cluster):
         self.osdmap_fn = "%s/osdmap" % self.tmp_dir
         self.monmap_fn = "%s/monmap" % self.tmp_dir
         self.use_existing = config.get('use_existing', True)
+        self.initialized = self.use_existing
         self.newstore_block = config.get('newstore_block', False)
         self.version_compat = config.get('version_compat', '')
         # these parameters control parallel OSD build 
@@ -138,6 +139,9 @@ class Ceph(Cluster):
         self.osd_count = config.get('osds_per_node') * len(settings.getnodes('osds'))
 
     def initialize(self):
+        if self.initialized:
+            return
+
         # Reset the rulesets
         self.ruleset_map = {}
         self.cur_ruleset = 1
@@ -200,6 +204,7 @@ class Ceph(Cluster):
             time.sleep(self.idle_duration)
             monitoring.stop()
 
+        self.initialized = True
         return True
 
     def shutdown(self):
