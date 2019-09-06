@@ -51,7 +51,11 @@ class LibrbdFio(Benchmark):
         self.data_pool = None 
         # use_existing_volumes needs to be true to set the pool and rbd names
         self.use_existing_volumes = config.get('use_existing_volumes', False)
-        self.pool_name = config.get("poolname", "cbt-librbdfio")
+
+        self.pool_name = 'cbt-librbdfio' + self.concurrent_suffiz
+        if 'poolname' in config:
+            self.pool_name = config.get('poolname')
+
         self.rbdname = config.get('rbdname', '')
 
 	self.total_procs = self.procs_per_volume * self.volumes_per_client * len(settings.getnodes('clients').split(','))
