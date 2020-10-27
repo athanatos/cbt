@@ -42,7 +42,8 @@ def project(name, config, fio_stats, perf_stats):
 
     perf = {
         k: v['avgtime'] for k, v in
-        [x for x in list(perf_stats['perfcounter_collection']['bluestore'].items()) if '_lat' in x[0]]
+        filter(lambda x: '_lat' in x[0],
+               perf_stats['perfcounter_collection']['bluestore'].items())
         }
 
     return {
@@ -67,7 +68,7 @@ def dump_target(name, directory):
 
 def generate_summary(filtered, match):
     def config_to_frozen(config, match):
-        ret = dict([x for x in list(config.items()) if x[0] not in match])
+        ret = dict(filter(lambda x: x[0] not in match, config.items()))
         if 'run' in ret:
             del ret['run']
         return frozenset(sorted(ret.items()))
@@ -79,7 +80,7 @@ def generate_summary(filtered, match):
             if key not in grouped:
                 grouped[key] = []
             grouped[key].append(run)
-        return [{'config': dict(list(k)), 'runs': v} for k, v in list(grouped.items())]
+        return [{'config': dict(list(k)), 'runs': v} for k, v in grouped.items()]
 
     grouped = group_by_config(filtered)
 
@@ -87,7 +88,7 @@ def generate_summary(filtered, match):
         ret = set()
         for run in group:
             ret = ret.union(
-                [k for v, k in sorted(((a, b) for b, a in list(run['perf'].items())))][::-1][:5]
+                [k for v, k in sorted(((a, b) for b, a in run['perf'].items()))][::-1][:5]
             )
         return ret
 
@@ -97,12 +98,12 @@ def generate_summary(filtered, match):
                 'tp': run['fio']['write']['iops'],
                 'lat': run['fio']['write']['clat_mean_ns'] / 1000000000.0,
                 'slat': run['fio']['write']['slat_mean_ns'] / 1000000000.0,
-                'perf': dict([x for x in list(run['perf'].items()) if x[0] in perfs])
+                'perf': dict(filter(lambda x: x[0] in perfs, run['perf'].items()))
             }
         return ret
 
     def sort_by(f, input):
-        return [v for (_, _, v) in sorted([(f(x[0]), x[1], x[0]) for x in zip(input, list(range(len(input))))])]
+        return [v for (_, _, v) in sorted(map(lambda x: (f(x[0]), x[1], x[0]), zip(input, range(len(input)))))]
 
     def project_group(group):
         perfs = union_top_n(group['runs'])
