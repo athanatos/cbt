@@ -3,9 +3,9 @@ set -e
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 
 # configurations
-RESULT_DIR="$TOP_DIR/results"
-BUILD_DIR="~/ceph/build/"
-FIO_CONF="~/ceph/rbd_write.fio"
+RESULT_DIR=${RESULT_DIR:-"$TOP_DIR/results"}
+BUILD_DIR=${BUILD_DIR:-"~/ceph/build/"}
+FIO_CONF=${FIO_CONF:-"~/ceph/rbd_write.fio"}
 POOL_NAME="rbd"
 POOL_NUM=128
 TOTAL_ROUND=3
