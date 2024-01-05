@@ -1,0 +1,2 @@
+notes on testing crimson on folio05
+- 

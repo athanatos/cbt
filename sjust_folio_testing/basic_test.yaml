@@ -1,0 +1,45 @@
+cluster:
+  user: 'sjust'
+  head: "folio05"
+  clients: ["folio05"]
+  osds: ["folio05"]
+  mons:
+    folio05:
+      a: "127.0.0.1:6789"
+  osds_per_node: 1
+  conf_file: '/home/sjust/cbt/sjust_folio_testing/ceph.basic.conf'
+  iterations: 1
+  use_existing: False
+  clusterid: "ceph"
+  tmp_dir: "/home/sjust/cbt-tmp"
+  ceph-osd_cmd: "/home/sjust/ceph/build/bin/crimson-osd"
+  ceph-mon_cmd: "/home/sjust/ceph/build/bin/ceph-mon"
+  ceph-run_cmd: "/home/sjust/ceph/src/ceph-run"
+  ceph-mgr_cmd: "/home/sjust/ceph/build/bin/ceph-mgr"
+  ceph-mds_cmd: "/home/sjust/ceph/build/bin/ceph-mds"
+  ceph-rgw_cmd: "/home/sjust/ceph/build/bin/ceph-rgw"
+  ceph-authtool_cmd: "/home/sjust/ceph/build/bin/ceph-rgw"
+  radosgw-admin_cmd: "/home/sjust/ceph/build/bin/ceph-rgw"
+  ceph-cmd: "/home/sjust/ceph/build/bin/ceph"
+  ceph-fuse_cmd: "/home/sjust/ceph/build/bin/ceph-fuse"
+  rados_cmd: "/home/sjust/ceph/build/bin/rados"
+  rbd_cmd: "/home/sjust/ceph/build/bin/rbd"
+  rbd-nbd_cmd: "/home/sjust/ceph/build/bin/rbd-nbd"
+  rbd-fuse_cmd:  "/home/sjust/ceph/build/bin/rbd-fuse"
+
+  pool_profiles:
+    rbd:
+      pg_size: 128
+      pgp_size: 128
+      replication: 1
+benchmarks:
+  librbdfio:
+    time: 300
+    vol_size: 16384
+    mode: [read, write, randread, randwrite]
+    op_size: [4194304, 2097152, 1048576]
+    concurrent_procs: [1]
+    iodepth: [64]
+    osd_ra: [4096]
+    cmd_path: 'fio'
+    pool_profile: 'rbd'
