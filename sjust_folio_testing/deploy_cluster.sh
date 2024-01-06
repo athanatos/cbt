@@ -15,7 +15,7 @@ chmod +x cephadm
 
 if sudo ./cephadm shell -- ceph -s ; then
   sudo ./cephadm shell -- ceph mgr module disable cephadm || true
-	FSID = $(sudo ./cephadm shell -- ceph fsid)
+	FSID=$(sudo ./cephadm shell -- ceph fsid)
 	sudo ./cephadm rm-cluster --force --zap-osds --fsid ${FSID}
 fi
 
