@@ -2,7 +2,6 @@
 
 # script to install CBT dependencies and tools for active benchmarking
 
-sudo yum -y install deltarpm 
 sudo yum check-update
 sudo yum -y update
 sudo yum install -y psmisc util-linux coreutils xfsprogs e2fsprogs findutils \
