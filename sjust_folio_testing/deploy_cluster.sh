@@ -26,9 +26,8 @@ sudo ./cephadm \
 	bootstrap \
 	--allow-mismatched-release \
 	--log-to-file \
-	--mon-ip 127.0.0.1 \
-	--skip-mon-network \
+	--mon-ip 172.21.5.155 \
 	--single-host-defaults
 
-sudo ./cephadm shell -- ceph config set mon public_network '127.0.0.0/24'
+#sudo ./cephadm shell -- ceph config set mon public_network '127.0.0.0/24'
 sudo ./cephadm shell -- ceph orch apply osd --all-available-devices
