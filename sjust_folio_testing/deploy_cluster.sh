@@ -30,5 +30,5 @@ sudo ./cephadm \
 	--skip-mon-network \
 	--single-host-defaults
 
-sudo ./cephadm shell -- ceph config set mon public_network '127.0.0.1/24'
+sudo ./cephadm shell -- ceph config set mon public_network '127.0.0.0/24'
 sudo ./cephadm shell -- ceph orch apply osd --all-available-devices
