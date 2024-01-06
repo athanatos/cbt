@@ -22,7 +22,7 @@ fi
 # bootstrap cluster
 
 sudo ./cephadm \
-  --image quay.ceph.io/ceph-ci/ceph:${CEPH_SHA1} \ #-crimson \
+  --image quay.ceph.io/ceph-ci/ceph:${CEPH_SHA1}-crimson \
 	bootstrap \
 	--allow-mismatched-release \
 	--log-to-file \
