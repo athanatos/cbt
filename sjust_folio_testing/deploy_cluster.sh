@@ -11,6 +11,14 @@ cd ${BINDIR}
 curl --silent --remote-name --location https://download.ceph.com/rpm-${CEPHADM_RELEASE}/el9/noarch/cephadm
 chmod +x cephadm
 
+# clear old cluster
+
+if sudo ./cephadm shell -- ceph -s ; then
+  sudo ./cephadm shell -- ceph mgr module disable cephadm
+	FSID = $(sudo ./cephadm shell -- ceph fsid)
+	sudo ./cephadm rm-cluster --force --zap-osds --fsid ${FSID}
+fi
+
 # bootstrap cluster
 
 sudo ./cephadm \
