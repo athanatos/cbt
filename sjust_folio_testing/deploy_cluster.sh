@@ -18,4 +18,5 @@ sudo ./cephadm \
 	bootstrap \
 	--allow-mismatched-release \
 	--log-to-file \
-	--mon-ip 127.0.0.1
+	--mon-ip 127.0.0.1 \
+	--skip-mon-network
