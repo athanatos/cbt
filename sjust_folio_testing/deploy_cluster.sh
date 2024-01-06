@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 CEPH_SHA1=9d465d1f4bbf3adc8c5d0a2ed062f92b7dccc555
 
@@ -12,8 +13,9 @@ chmod +x cephadm
 
 # bootstrap cluster
 
-./cephadm boostrap \
+./cephadm \
   --image quay.ceph.io/ceph-ci/ceph:${CEPH_SHA1}-crimson \
 	--allow-mismatched-release bootstrap \
 	--mon-ip 127.0.0.1 \
-	--log-to-file
+	--log-to-file \
+	bootstrap
