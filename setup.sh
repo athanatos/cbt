@@ -16,11 +16,6 @@ cd ${HOME}/fio
 ./configure
 make
 
-# wget < Red Hat Ceph Storage ISO URL >
-# sudo mount -o loop Ceph-*-dvd.iso /mnt
-sudo yum localinstall -y /mnt/{MON,OSD}/*.rpm
-sudo yum localinstall -y /mnt/Installer/ceph-deploy-*.rpm
-
 sudo sed -i 's/Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers
 sudo setenforce 0
 ( awk '!/SELINUX=/' /etc/selinux/config ; echo "SELINUX=disabled" ) > /tmp/x
