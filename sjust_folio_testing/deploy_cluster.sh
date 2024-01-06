@@ -13,7 +13,7 @@ chmod +x cephadm
 
 # bootstrap cluster
 
-./cephadm \
+sudo ./cephadm \
   --image quay.ceph.io/ceph-ci/ceph:${CEPH_SHA1}-crimson \
 	bootstrap \
 	--allow-mismatched-release \
