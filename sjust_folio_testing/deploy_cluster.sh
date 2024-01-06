@@ -15,7 +15,7 @@ chmod +x cephadm
 
 ./cephadm \
   --image quay.ceph.io/ceph-ci/ceph:${CEPH_SHA1}-crimson \
+	bootstrap \
 	--allow-mismatched-release \
 	--log-to-file \
-	bootstrap \
 	--mon-ip 127.0.0.1
