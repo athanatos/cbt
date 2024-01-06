@@ -22,12 +22,15 @@ fi
 # bootstrap cluster
 
 sudo ./cephadm \
-  --image quay.ceph.io/ceph-ci/ceph:${CEPH_SHA1}-crimson \
+  --image quay.ceph.io/ceph-ci/ceph:${CEPH_SHA1} \ #-crimson \
 	bootstrap \
 	--allow-mismatched-release \
 	--log-to-file \
 	--mon-ip 172.21.5.155 \
 	--single-host-defaults
 
-#sudo ./cephadm shell -- ceph config set mon public_network '127.0.0.0/24'
+sudo ./cephadm shell -- ceph config set global 'enable_experimental_unrecoverable_data_corrupting_features' crimson
+sudo ./cephadm shell -- ceph osd set-allow-crimson --yes-i-really-mean-it
+sudo ./cephadm shell -- ceph config set mon osd_pool_default_crimson true
+
 sudo ./cephadm shell -- ceph orch apply osd --all-available-devices
