@@ -29,6 +29,10 @@ sudo ./cephadm \
 	--mon-ip 172.21.5.155 \
 	--single-host-defaults
 
+sudo ./cephadm shell -- ceph config set osd debug_osd 20
+sudo ./cephadm shell -- ceph config set osd debug_bluestore 20
+sudo ./cephadm shell -- ceph config set osd debug_ms 1
+
 sudo ./cephadm shell -- ceph config set global 'enable_experimental_unrecoverable_data_corrupting_features' crimson
 sudo ./cephadm shell -- ceph osd set-allow-crimson --yes-i-really-mean-it
 sudo ./cephadm shell -- ceph config set mon osd_pool_default_crimson true
