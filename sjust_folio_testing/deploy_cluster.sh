@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-CEPH_SHA1=ad41d5cb72163a6c48c91045a31c80dde9003859
+CEPH_SHA1=47b9aa7716fe9f7da653928b0aad8482d9aa29a0
 
 # download cephadm
 
