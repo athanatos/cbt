@@ -66,7 +66,7 @@ def do_bench(configs, repeat):
         repeat_path = f"{root}/rep:{repeat_id}"
         os.makedirs(repeat_path)
         for test_id, test_config in enumerate(configs):
-            command = "sudo ./crimson_bench_tool.py"
+            command = "./crimson_bench_tool.py"
             for key in test_config:
                 if key in no_value_attributes:
                     command += f" {trans(key)}"
@@ -125,7 +125,7 @@ def delete_and_create_at_local(path):
     if path not in files:
         os.makedirs(path)
     else:
-        os.system(f"sudo rm -rf {path}")
+        os.system(f"rm -rf {path}")
         os.makedirs(path)
 
 def adjust_results(results, y):
@@ -299,5 +299,5 @@ if __name__ == "__main__":
             draw(analysed_results, configs, args.x, y, res_path, args.comp)
 
     if args.clean:
-        os.system("sudo rm -rf autobench.*")
-        os.system("sudo rm -rf graphic.autobench.*")
+        os.system("rm -rf autobench.*")
+        os.system("rm -rf graphic.autobench.*")
