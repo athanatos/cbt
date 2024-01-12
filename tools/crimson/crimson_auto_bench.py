@@ -66,7 +66,7 @@ def do_bench(configs, repeat):
         repeat_path = f"{root}/rep:{repeat_id}"
         os.makedirs(repeat_path)
         for test_id, test_config in enumerate(configs):
-            command = "./crimson_bench_tool.py"
+            command = "/home/sjust/cbt/tools/crimson/crimson_bench_tool.py"
             for key in test_config:
                 if key in no_value_attributes:
                     command += f" {trans(key)}"
