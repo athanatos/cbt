@@ -980,7 +980,7 @@ class Environment():
 
         # start ceph
         ceph_start_max_watting_time = 40
-        start_proc = Popen("exec " + command, shell=True, \
+        start_proc = Popen(command, shell=True, \
                            stdout=PIPE, encoding="utf-8")
         wait_count = 0
         done = start_proc.poll()
