@@ -8,5 +8,6 @@ BENCH_CONF=${SJUST_DIR}/bench_config.yaml
 
 OUTPUT_DIR=~/output/
 
-cd ${CAB_DIR}
-${CAB_DIR}/crimson_auto_bench.py --run --x client --config ${BENCH_CONF}
+cd ${CEPH_DIR}/build
+#${CAB_DIR}/crimson_auto_bench.py --run --x client --config ${BENCH_CONF}
+${CAB_DIR}/crimson_bench_tool.py --client 4 --thread 2 --bench-taskset 16-31 --time 60 --block-size 4096 --crimson --dev /dev/nvme0n1 --rand-write 1
