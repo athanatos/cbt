@@ -6,6 +6,5 @@ block_size: 4096
 smp: 2 4 8
 time: 100
 retry_limit: 2
-crimson: true
 store: bluestore
 dev: /dev/nvme0n1
