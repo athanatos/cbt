@@ -1,9 +1,9 @@
 # this is an example for the config file of crimson_auto_bench
 
 fio-rbd-rand-write: 1
-client: 1 2
+client: 4
 block_size: 4096
-smp: 1 2
+smp: 2 4 8
 time: 100
 retry_limit: 2
 store: bluestore
