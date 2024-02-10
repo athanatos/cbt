@@ -8,3 +8,4 @@ time: 100
 retry_limit: 2
 store: bluestore
 dev: /dev/nvme0n1
+crimson: true
