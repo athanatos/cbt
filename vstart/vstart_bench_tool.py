@@ -25,76 +25,6 @@ overlay:
 
 """
 
-class Cluster:
-    def make(conf):
-        ctype = conf.get('type', 'vstart')
-        if ctype == 'vstart':
-            return VStartCluster(conf)
-        else:
-            raise Exception("unrecognized cluster.type {}".format(ctype))
-
-    def start(self): pass
-    def stop(self): pass
-
-class VStartCluster(Cluster):
-    def __init__(self, conf):
-        self.conf = conf
-        if 'source_directory' not in self.conf:
-            raise Exception('VStartCluster: must specify cluster.source_directory')
-        self.base_dir = self.conf['source_directory']
-        self.build_dir = os.path.join(self.base_dir, 'build')
-        self.bin_dir = os.path.join(self.base_dir, 'bin')
-        self.command_timeout = int(self.conf.get('command_timeout', 120))
-        self.crimson = self.conf.get('crimson', False)
-        if not isinstance(self.crimson, bool):
-            raise Exception(
-                "VStartCluster: crimson must be boolean (defaults to False), {} found"
-                .format(self.crimson))
-
-    def get_args(self):
-        ret = [
-            '--require-osd-and-client-version', 'squid',
-            '--without-dashboard',
-            '-X',
-            '--redirect-output',
-            '-n', '--no-restart'
-        ]
-        if self.crimson:
-            ret += ['--crimson']
-
-    def get_env(self):
-        return {
-            'MDS': 0,
-            'MGR': 1,
-            'OSD': 1,
-            'MON': 1
-        }
-
-    def start(self):
-        startup_process = subprocess.run(
-            [ '../src/vstart.sh'] + self.get_args(),
-            env = self.get_env(),
-            cwd = self.build_dir,
-            shell = True,
-            timeout = self.command_timeout)
-        if startup_process.return_code != 0:
-            raise Exception(
-                "VStartCluster.start startup process exited with code {}"
-                .format(startup_process.return_code))
-        
-
-    def stop(self): pass
-        stop_process = subprocess.run(
-            [ '../src/stop.sh'],
-            cwd = self.build_dir,
-            shell = True,
-            timeout = self.command_timeout)
-        if stop_process.return_code != 0:
-            raise Exception(
-                "VStartCluster.stop stop process exited with code {}"
-                .format(stop_process.return_code))
-            
-
 def recursive_merge(d1, d2):
     if d1 is None:
         return copy.deepcopy(d2)
@@ -125,6 +55,162 @@ def read_configs(path):
     with open(path) as f:
         return generate_configs(yaml.safe_load(f))
 
+def get_git_version(path):
+    return str(
+        subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip(),
+        'utf-8')
+
+def set_attr_from_config(self, defaults, conf):
+    for k in conf:
+        if k not in defaults:
+            raise Exception(
+                "{}: unknown config key {}",
+                self.__class__.__name__,
+                k);
+    for k, v in defaults.items():
+        if k in conf:
+            setattr(self, k, conf[k])
+        elif v is None:
+            raise Exception(
+                "{}: missing required key {}",
+                self.__class__.__name__,
+                k);
+        else:
+            setattr(self, k, v)
+                
+
+class Cluster:
+    def make(conf):
+        ctype = conf.get('type', 'vstart')
+        cluster_conf = copy.deepcopy(conf)
+        del cluster_conf['type']
+        if ctype == 'vstart':
+            return VStartCluster(cluster_conf)
+        else:
+            raise Exception(f"unrecognized cluster.type {ctype}")
+
+    class Handle:
+        def get_conf_directory(self): pass
+
+        def get_bin_directory(self): pass
+        def create_pool(self, name, pg_num):
+            subprocess.check_output([
+                os.path.join(self.get_bin_directory(), 'ceph'),
+                'osd', 'pool', 'create')) #working
+                
+        def create_rbd_image(self, pool, name, size): pass
+    def start(self): pass
+
+    def stop(self): pass
+    def get_output(self): pass
+
+
+class VStartCluster(Cluster):
+    def __init__(self, conf):
+        set_attr_from_config(
+            self,
+            {
+                'source_directory': None,
+                'command_timeout': 120,
+                'crimson': False
+            },
+            conf)
+        self.build_directory = os.path.join(self.source_directory, 'build')
+        self.bin_directory = os.path.join(self.source_directory, 'bin')
+        self.output = {}
+
+    def get_output(self):
+        return self.output
+
+    def get_args(self):
+        ret = [
+            '--require-osd-and-client-version', 'squid',
+            '--without-dashboard',
+            '-X',
+            '--redirect-output', '--debug',
+            '-n', '--no-restart'
+        ]
+        if self.crimson:
+            ret += ['--crimson']
+        return ret
+
+    def get_env(self):
+        return {
+            'MDS': '0',
+            'MGR': '1',
+            'OSD': '1',
+            'MON': '1'
+        }
+
+    class Handle(Cluster.Handle):
+        def __init__(self, parent):
+            self.conf_directory = parent.build_directory
+            self.bin_directory = parent.bin_directory
+
+        def get_conf_directory(self):
+            return self.conf_directory(self)
+
+        def get_bin_directory(self);
+            return self.bin_directory(self)
+
+    def start(self):
+        self.output['git_sha1'] = get_git_version(self.source_directory)
+        self.stop()
+        startup_process = subprocess.run(
+            [ '../src/vstart.sh'] + self.get_args(),
+            env = self.get_env(),
+            cwd = self.build_directory,
+            shell = True,
+            timeout = self.command_timeout)
+        if startup_process.returncode != 0:
+            raise Exception(
+                f"VStartCluster.start startup process exited with code {startup_process.returncode}")
+        
+    def stop(self):
+        stop_process = subprocess.run(
+            [ '../src/stop.sh'],
+            cwd = self.build_directory,
+            shell = True,
+            timeout = self.command_timeout)
+        if stop_process.returncode != 0:
+            raise Exception(
+                f"VStartCluster.stop stop process exited with code {stop_process.returncode}")
+
+class Workload:
+    def start(self): pass
+    def join(self): pass
+
+    def make(conf):
+        wtype = conf.get('type', None)
+        workload_cond = copy.deepcopy(conf)
+        del workload_conf['type']
+        if wtype == 'fio_rbd':
+            return FioRBD(cluster_conf)
+        else:
+            raise Exception(f"unrecognized cluster.type {wtype}")
+
+class FioRBD(Workload):
+    def __init__(self, conf):
+        set_attr_from_config(
+            self,
+            {
+                'bin': 'fio',
+                'fio_args': {}
+            },
+            conf)
+        self.fio_args['output-format'] = 'json'
+
+    def get_fio_args():
+        def get_arg(x):
+            k, v = x
+            if v is None:
+                return f"-{k}"
+            else:
+                return f"-{k}={v}"
+        return [get_arg(x) for x in self.fio_args.items()]
+                
+    def start(self): pass
+
 def main():
     parser = argparse.ArgumentParser(
         prog='vstart_bench_tool',
@@ -134,9 +220,17 @@ def main():
     )
     args = parser.parse_args()
 
+    outputs = []
     for name, override, base, config in read_configs(args.config):
+        output = {}
         print(yaml.dump(config))
         cluster = Cluster.make(config.get('cluster', {}))
+        cluster.start()
+        time.sleep(10)
+        cluster.stop()
+        output['cluster'] = cluster.get_output()
+        outputs.append(output)
+    print(yaml.dump(outputs))
 
 
 if __name__ == "__main__":
