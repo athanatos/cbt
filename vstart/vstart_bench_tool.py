@@ -25,6 +25,20 @@ overlay:
 
 """
 
+def get_systemd_run_prefix(cpuset):
+    if cpuset:
+        return [
+            'systemd-run',
+            f"--property=AllowedCPUs='{cpuset}'",
+            '--same-dir',
+            '--user', '--scope', '-G', '--'
+        ]
+    else:
+        return []
+
+def get_merged_env(env):
+    return recursive_merge(dict(os.environ), env)
+
 def recursive_merge(d1, d2):
     if d1 is None:
         return copy.deepcopy(d2)
@@ -61,6 +75,7 @@ def get_git_version(path):
         'utf-8')
 
 def set_attr_from_config(self, defaults, conf):
+    self.conf = {}
     for k in conf:
         if k not in defaults:
             raise Exception(
@@ -70,6 +85,7 @@ def set_attr_from_config(self, defaults, conf):
     for k, v in defaults.items():
         if k in conf:
             setattr(self, k, conf[k])
+            self.conf[k] = conf[k]
         elif v is None:
             raise Exception(
                 "{}: missing required key {}",
@@ -77,7 +93,8 @@ def set_attr_from_config(self, defaults, conf):
                 k);
         else:
             setattr(self, k, v)
-                
+            self.conf[k] = v
+
 
 class Cluster:
     def make(conf):
@@ -93,12 +110,43 @@ class Cluster:
         def get_conf_directory(self): pass
 
         def get_bin_directory(self): pass
+
+        def get_ceph_bin(self):
+            return os.path.join(self.get_bin_directory(), 'ceph')
+
+        def get_rbd_bin(self):
+            return os.path.join(self.get_bin_directory(), 'rbd')
+
+        def cluster_cmd(self, cmd, positional, named):
+            print(f"Handle.cluster_cmd({cmd} {positional} {named})")
+            subprocess.check_output(
+                ([cmd] + \
+                 [str(x) for x in positional] +
+                 [f"--{k}={v}" for k, v in named.items()]),
+                cwd = self.get_conf_directory()
+            )
+
+        def ceph_cmd(self, *args, **kwargs):
+            self.cluster_cmd(self.get_ceph_bin(), *args, **kwargs)
+
+        def rbd_cmd(self, *args, **kwargs):
+            self.cluster_cmd(self.get_rbd_bin(), *args, **kwargs)
+
         def create_pool(self, name, pg_num):
-            subprocess.check_output([
-                os.path.join(self.get_bin_directory(), 'ceph'),
-                'osd', 'pool', 'create')) #working
-                
-        def create_rbd_image(self, pool, name, size): pass
+            self.ceph_cmd(['osd', 'pool', 'create', name, pg_num, pg_num], {})
+                            
+        def create_rbd_image(self, pool, name, size):
+            self.rbd_cmd(
+                ['create', name],
+                {
+                    'size': size,
+                    'image-format': '2',
+                    'rbd_default_features': '3',
+                    'pool': pool
+                })
+
+    def get_handle(self): pass
+
     def start(self): pass
 
     def stop(self): pass
@@ -112,19 +160,21 @@ class VStartCluster(Cluster):
             {
                 'source_directory': None,
                 'command_timeout': 120,
-                'crimson': False
+                'crimson': False,
+                'cpuset': ''
             },
             conf)
         self.build_directory = os.path.join(self.source_directory, 'build')
-        self.bin_directory = os.path.join(self.source_directory, 'bin')
-        self.output = {}
+        self.bin_directory = os.path.join(self.build_directory, 'bin')
+        self.output = {
+            'conf': self.conf
+        }
 
     def get_output(self):
         return self.output
 
     def get_args(self):
         ret = [
-            '--require-osd-and-client-version', 'squid',
             '--without-dashboard',
             '-X',
             '--redirect-output', '--debug',
@@ -148,19 +198,24 @@ class VStartCluster(Cluster):
             self.bin_directory = parent.bin_directory
 
         def get_conf_directory(self):
-            return self.conf_directory(self)
+            return self.conf_directory
 
-        def get_bin_directory(self);
-            return self.bin_directory(self)
+        def get_bin_directory(self):
+            return self.bin_directory
+
+    def get_handle(self):
+        return VStartCluster.Handle(self)
 
     def start(self):
         self.output['git_sha1'] = get_git_version(self.source_directory)
         self.stop()
+        cmdline = get_systemd_run_prefix(self.cpuset) + \
+            [ '../src/vstart.sh'] + self.get_args()
+        print("VStartCluster.start: {}".format(" ".join(cmdline)))
         startup_process = subprocess.run(
-            [ '../src/vstart.sh'] + self.get_args(),
-            env = self.get_env(),
+            cmdline,
+            env = get_merged_env(self.get_env()),
             cwd = self.build_directory,
-            shell = True,
             timeout = self.command_timeout)
         if startup_process.returncode != 0:
             raise Exception(
@@ -179,28 +234,64 @@ class VStartCluster(Cluster):
 class Workload:
     def start(self): pass
     def join(self): pass
+    def get_output(self): pass
 
-    def make(conf):
+    def make(conf, handle):
         wtype = conf.get('type', None)
-        workload_cond = copy.deepcopy(conf)
+        workload_conf = copy.deepcopy(conf)
         del workload_conf['type']
         if wtype == 'fio_rbd':
-            return FioRBD(cluster_conf)
+            return FioRBD(workload_conf, handle)
         else:
             raise Exception(f"unrecognized cluster.type {wtype}")
 
 class FioRBD(Workload):
-    def __init__(self, conf):
+    """
+    Example config:
+
+    workload:
+        type: FioRBD
+        bin: fio
+        fio_args:
+            iodepth: 32
+            rw: randread
+            bs: 4096
+            numjobs: 4 
+            runtime: 120
+    """
+    def __init__(self, conf, cluster_handle):
         set_attr_from_config(
             self,
             {
                 'bin': 'fio',
-                'fio_args': {}
+                'fio_args': {},
+                'cpuset': '',
+                'timeout_ratio': 2,
+                'rbd_name': 'test_rbd',
+                'pool_name': 'test_pool'
             },
             conf)
+        self.fio_args['ioengine'] = 'rbd'
         self.fio_args['output-format'] = 'json'
+        self.fio_args['direct'] = '1'
+        self.fio_args['group_reporting'] = None
+        self.fio_args['name'] = 'fio'
+        self.fio_args['pool'] = self.pool_name
+        self.fio_args['rbdname'] = self.rbd_name
+        self.cluster_handle = cluster_handle
+        self.conf['fio_args'] = self.fio_args
+        try:
+            self.timeout = int(self.fio_args['runtime']) * self.timeout_ratio
+        except:
+            raise Exception("FioRBD: workload.fio_args.runtime required")
+        self.output = {
+            'conf': self.conf
+        }
 
-    def get_fio_args():
+    def get_output(self):
+        return self.output
+
+    def get_fio_args(self):
         def get_arg(x):
             k, v = x
             if v is None:
@@ -209,7 +300,19 @@ class FioRBD(Workload):
                 return f"-{k}={v}"
         return [get_arg(x) for x in self.fio_args.items()]
                 
-    def start(self): pass
+    def start(self):
+        self.cluster_handle.create_pool(self.pool_name, 32)
+        self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, '1G')
+        self.process = subprocess.Popen(
+            get_systemd_run_prefix(self.cpuset) + [self.bin] + \
+                self.get_fio_args(),
+            env = get_merged_env({}),
+            cwd = self.cluster_handle.get_conf_directory(),
+            stdout = subprocess.PIPE)
+
+    def join(self):
+            self.process.wait(self.timeout)
+            self.output['results'] = yaml.safe_load(self.process.stdout)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -226,9 +329,14 @@ def main():
         print(yaml.dump(config))
         cluster = Cluster.make(config.get('cluster', {}))
         cluster.start()
-        time.sleep(10)
+        
+        workload = Workload.make(config.get('workload', {}), cluster.get_handle())
+        workload.start()
+        workload.join()
+
         cluster.stop()
         output['cluster'] = cluster.get_output()
+        output['workload'] = workload.get_output()
         outputs.append(output)
     print(yaml.dump(outputs))
 
