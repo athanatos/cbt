@@ -1187,7 +1187,7 @@ class Environment():
                     + " -pool=" + pool \
                     + " -rbdname=" + image \
                     + " -direct=1" \
-                    + " -iodepth=" + str(thread_num) \
+                    + " -iodepth=128" \
                     + " -rw=write" \
                     + " -bs=" + str(bs) \
                     + " -numjobs=1" \
