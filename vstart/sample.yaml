@@ -1,0 +1,21 @@
+base:
+  cluster:
+    type: vstart
+    source_directory: /home/sam/git-checkouts/ceph-workspace/wip-crimson-coroutines
+    cpuset: 16-32
+  workload:
+    type: fio_rbd
+    fio_args:
+      iodepth: 32
+      rw: randread
+      bs: 4096
+      numjobs: 4
+      runtime: 5
+
+#overrides:
+#  crimson:
+#    cluster:
+#      crimson: true
+#  classic:
+#    cluster:
+#      crimson: false
