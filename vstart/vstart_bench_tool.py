@@ -182,7 +182,7 @@ class VStartCluster(Cluster):
         ret = [
             '--without-dashboard',
             '-X',
-            '--redirect-output', '--debug',
+            '--redirect-output',
             '-n', '--no-restart'
         ]
         if self.crimson:
