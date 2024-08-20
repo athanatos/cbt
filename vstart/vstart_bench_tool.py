@@ -309,10 +309,12 @@ class FioRBD(Workload):
     def start(self):
         self.cluster_handle.create_pool(self.pool_name, 32)
         self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, '1G')
+        args = get_systemd_run_prefix(self.cpuset) + [self.bin] + \
+            self.get_fio_args()
+        env = get_merged_env({})
+        print("FioRBD.start args={}, env={}".format(args, env))
         self.process = subprocess.Popen(
-            get_systemd_run_prefix(self.cpuset) + [self.bin] + \
-                self.get_fio_args(),
-            env = get_merged_env({}),
+            args, env = env,
             cwd = self.cluster_handle.get_conf_directory(),
             stdout = subprocess.PIPE)
 
