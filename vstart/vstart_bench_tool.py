@@ -161,6 +161,8 @@ class VStartCluster(Cluster):
                 'source_directory': None,
                 'command_timeout': 120,
                 'crimson': False,
+                'cpuset_base': 0,
+                'osd_cores': 8,
                 'cpuset': ''
             },
             conf)
@@ -169,6 +171,9 @@ class VStartCluster(Cluster):
         self.output = {
             'conf': self.conf
         }
+        if sef.cpuset is '':
+            self.cpuset = "{}-{}".format(
+                self.cpuset_base, self.cpuset_base + self.osd_cores)
 
     def get_output(self):
         return self.output
@@ -182,6 +187,7 @@ class VStartCluster(Cluster):
         ]
         if self.crimson:
             ret += ['--crimson']
+            ret += ["--crimson-smp={}".format(self.osd_cores)]
         return ret
 
     def get_env(self):
