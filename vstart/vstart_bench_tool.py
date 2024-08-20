@@ -187,7 +187,7 @@ class VStartCluster(Cluster):
         ]
         if self.crimson:
             ret += ['--crimson']
-            ret += ["--crimson-smp {}".format(self.osd_cores)]
+            ret += ["--crimson-smp", "{}".format(self.osd_cores)]
         return ret
 
     def get_env(self):
