@@ -171,7 +171,7 @@ class VStartCluster(Cluster):
         self.output = {
             'conf': self.conf
         }
-        if sef.cpuset is '':
+        if self.cpuset is '':
             self.cpuset = "{}-{}".format(
                 self.cpuset_base, self.cpuset_base + self.osd_cores)
 
