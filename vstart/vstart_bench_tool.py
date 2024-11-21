@@ -164,6 +164,7 @@ class VStartCluster(Cluster):
                 'cpuset_base': 0,
                 'osd_cores': 8,
                 'cpuset': ''
+                'seastore': False
             },
             conf)
         self.build_directory = os.path.join(self.source_directory, 'build')
@@ -188,6 +189,11 @@ class VStartCluster(Cluster):
         if self.crimson:
             ret += ['--crimson']
             ret += ["--crimson-smp", "{}".format(self.osd_cores)]
+        if self.seastore:
+            if not self.crimson:
+                raise Exception(
+                    f"VStartCluster.get_args cannot specify seastore without crimson")
+            ret += ['--sesatore']
         return ret
 
     def get_env(self):
