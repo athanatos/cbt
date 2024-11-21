@@ -329,6 +329,9 @@ def main():
     parser.add_argument(
         '-c', '--config', help='path to yaml config file', required=True
     )
+    parser.add_argument(
+        '-o', '--output', help='path for results', required=False
+    )
     args = parser.parse_args()
 
     outputs = []
@@ -346,7 +349,11 @@ def main():
         output['cluster'] = cluster.get_output()
         output['workload'] = workload.get_output()
         outputs.append(output)
-    print(yaml.dump(outputs))
+    results = yaml.dump(outputs)
+    print(results)
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(results)
 
 
 if __name__ == "__main__":
