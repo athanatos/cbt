@@ -4,6 +4,7 @@ base:
     cpuset_base: 0
     osd_cores: 8
     crimson: true
+    seastore: true
   workload:
     type: fio_rbd
     fio_args:
@@ -11,7 +12,7 @@ base:
       rw: randread
       bs: 4096
       numjobs: 4
-      runtime: 1200
+      runtime: 120
       time_based:
 overrides:
   baseline-8pgs:
