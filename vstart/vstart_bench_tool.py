@@ -346,6 +346,7 @@ def main():
         workload.join()
 
         cluster.stop()
+        output['name'] = name
         output['cluster'] = cluster.get_output()
         output['workload'] = workload.get_output()
         outputs.append(output)
