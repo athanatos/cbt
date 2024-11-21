@@ -163,7 +163,7 @@ class VStartCluster(Cluster):
                 'crimson': False,
                 'cpuset_base': 0,
                 'osd_cores': 8,
-                'cpuset': ''
+                'cpuset': '',
                 'seastore': False
             },
             conf)
