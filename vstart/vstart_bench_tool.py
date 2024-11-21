@@ -193,7 +193,7 @@ class VStartCluster(Cluster):
             if not self.crimson:
                 raise Exception(
                     f"VStartCluster.get_args cannot specify seastore without crimson")
-            ret += ['--sesatore']
+            ret += ['--seastore']
         return ret
 
     def get_env(self):
