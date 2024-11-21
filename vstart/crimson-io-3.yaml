@@ -1,0 +1,36 @@
+base:
+  cluster:
+    type: vstart
+    cpuset_base: 0
+    osd_cores: 8
+    crimson: true
+  workload:
+    type: fio_rbd
+    fio_args:
+      iodepth: 32
+      rw: randread
+      bs: 4096
+      numjobs: 4
+      runtime: 1200
+      time_based:
+overrides:
+  baseline-8pgs:
+    cluster:
+      source_directory: /home/sjust/baseline
+    workload:
+      num_pgs: 8
+  wip-crimson-io-3-8pgs:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-io-3
+    workload:
+      num_pgs: 8
+  baseline-128pgs:
+    cluster:
+      source_directory: /home/sjust/baseline
+    workload:
+      num_pgs: 128
+  wip-crimson-io-3-128pgs:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-io-3
+    workload:
+      num_pgs: 128

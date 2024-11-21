@@ -258,6 +258,7 @@ class FioRBD(Workload):
     workload:
         type: FioRBD
         bin: fio
+        num_pgs: 32
         fio_args:
             iodepth: 32
             rw: randread
@@ -274,7 +275,8 @@ class FioRBD(Workload):
                 'cpuset': '',
                 'timeout_ratio': 2,
                 'rbd_name': 'test_rbd',
-                'pool_name': 'test_pool'
+                'pool_name': 'test_pool',
+                'num_pgs': 32
             },
             conf)
         self.fio_args['ioengine'] = 'rbd'
@@ -307,7 +309,7 @@ class FioRBD(Workload):
         return [get_arg(x) for x in self.fio_args.items()]
                 
     def start(self):
-        self.cluster_handle.create_pool(self.pool_name, 32)
+        self.cluster_handle.create_pool(self.pool_name, self.num_pgs)
         self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, '1G')
         args = get_systemd_run_prefix(self.cpuset) + [self.bin] + \
             self.get_fio_args()
