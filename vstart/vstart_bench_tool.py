@@ -193,7 +193,7 @@ class VStartCluster(Cluster):
             if self.seastore:
                 ret += ['--seastore']
                 if self.seastore_device:
-                    ret += [f"--seastore-devs={self.seastore_device}"]
+                    ret += ['--seastore-devs', self.seastore_device]
         return ret
 
     def get_env(self):
