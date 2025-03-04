@@ -14,7 +14,7 @@ base:
       bs: 65536
       numjobs: 4
       runtime: 120
-      time_based: true
+      time_based: 1
 overrides:
   old:
     cluster:
