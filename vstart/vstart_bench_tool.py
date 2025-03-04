@@ -72,7 +72,7 @@ def read_configs(path):
 def get_git_version(path):
     return str(
         subprocess.check_output(
-            ['git', 'rev-parse', 'HEAD']
+            ['git', 'rev-parse', 'HEAD'],
             cwd = path
         ).strip(), 'utf-8')
 
