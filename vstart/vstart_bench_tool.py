@@ -71,8 +71,10 @@ def read_configs(path):
 
 def get_git_version(path):
     return str(
-        subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip(),
-        'utf-8')
+        subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD']
+            cwd = path
+        ).strip(), 'utf-8')
 
 def set_attr_from_config(self, defaults, conf):
     self.conf = {}
