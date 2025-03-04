@@ -5,6 +5,7 @@ base:
     cpuset_base: 16
     osd_cores: 8
     crimson: true
+    seastore_device: /dev/nvme0n1
   workload:
     type: fio_rbd
     fio_args:
