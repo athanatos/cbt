@@ -1,0 +1,22 @@
+# try to reproduce 64k seq write regression between b5bae62c0 and 6f43298
+base:
+  cluster:
+    type: vstart
+    cpuset_base: 16
+    osd_cores: 8
+    crimson: true
+  workload:
+    type: fio_rbd
+    fio_args:
+      iodepth: 32
+      rw: write
+      bs: 65536
+      numjobs: 4
+      runtime: 120
+overrides:
+  old:
+    cluster:
+      source_directory: /home/sjust/testing-old
+  new:
+    cluster:
+      source_directory: /home/sjust/testing-new
