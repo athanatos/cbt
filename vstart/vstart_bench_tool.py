@@ -201,9 +201,8 @@ class VStartCluster(Cluster):
                 if self.seastore_devices is not []:
                     ret += ['--seastore-devs', ','.join(self.seastore_devices)]
         osd_options = ' '.join([f'--{k}={v}' for k, v in self.osd_options.items()])
-        print(osd_options)
         if osd_options is not '':
-            ret += f"""--osd-args='{osd_options}'"""
+            ret += ['--osd-args', f"""'{osd_options}'"""]
         return ret
 
     def get_env(self):
