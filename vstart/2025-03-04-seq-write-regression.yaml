@@ -27,9 +27,9 @@ base:
       runtime: 300
       time_based: 1
 overrides:
-#  old:
-#    cluster:
-#      source_directory: /home/sjust/testing-old
+  old:
+    cluster:
+      source_directory: /home/sjust/testing-old
   new:
     cluster:
       source_directory: /home/sjust/testing-new
