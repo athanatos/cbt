@@ -25,7 +25,7 @@ base:
       rw: write
       bs: 65536
       numjobs: 4
-      runtime: 300
+      runtime: 600
       time_based: 1
 overrides:
   old:
