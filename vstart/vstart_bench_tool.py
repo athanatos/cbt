@@ -200,7 +200,7 @@ class VStartCluster(Cluster):
                 ret += ['--seastore']
                 if self.seastore_devices is not []:
                     ret += ['--seastore-devs', ','.join(self.seastore_devices)]
-        for k, v in self.vstart_options:
+        for k, v in self.vstart_options.items():
             ret += [f'--{k}', str(v)]
         return ret
 
