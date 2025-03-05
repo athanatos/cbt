@@ -5,6 +5,7 @@ base:
     cpuset_base: 16
     osd_cores: 8
     crimson: true
+    seastore: true
     seastore_devices:
     - /dev/nvme0n1
     - /dev/nvme1n1
