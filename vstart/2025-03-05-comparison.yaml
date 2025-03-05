@@ -34,7 +34,6 @@ overrides:
     cluster:
       crimson: true
       seastore: true
-      source_directory: /home/sjust/testing-new
       osd_options:
         seastore_max_concurrent_transactions: 128
         seastore_cache_lru_size: 2G
