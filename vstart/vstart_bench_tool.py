@@ -149,6 +149,18 @@ class Cluster:
                     'pool': pool
                 })
 
+            # prepopulate
+            self.rbd_cmd([
+                'bench', 'write',
+                f'{pool}, {name}',
+            ], {
+                'io-type': 'write',
+                'io-size': '64K',
+                'io-threads': '8',
+                'io-pattern': 'seq',
+                'io-total': size
+            })
+
     def get_handle(self): pass
 
     def start(self): pass
@@ -324,7 +336,7 @@ class FioRBD(Workload):
             else:
                 return f"-{k}={v}"
         return [get_arg(x) for x in self.fio_args.items()]
-                
+
     def start(self):
         self.cluster_handle.create_pool(self.pool_name, self.pool_size, self.num_pgs)
         self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, self.rbd_size)
