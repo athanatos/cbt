@@ -292,7 +292,7 @@ class FioRBD(Workload):
                 'rbd_name': 'test_rbd',
                 'pool_name': 'test_pool',
                 'num_pgs': 32,
-                'pool_size': 1
+                'pool_size': 1,
                 'rbd_size': '1G'
             },
             conf)
