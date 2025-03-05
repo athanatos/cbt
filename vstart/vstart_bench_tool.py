@@ -152,7 +152,7 @@ class Cluster:
             # prepopulate
             self.rbd_cmd([
                 'bench', 'write',
-                f'{pool}, {name}',
+                f'{pool}/{name}',
             ], {
                 'io-type': 'write',
                 'io-size': '64K',
