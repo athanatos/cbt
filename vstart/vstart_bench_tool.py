@@ -181,7 +181,7 @@ class VStartCluster(Cluster):
                 'osd_cores': 8,
                 'cpuset': '',
                 'seastore': False,
-                'seastore_devices': [],
+                'osd_devices': [],
                 'num_osds': 1,
                 'osd_options': {}
             },
@@ -210,8 +210,11 @@ class VStartCluster(Cluster):
             ret += ["--crimson-smp", "{}".format(self.osd_cores)]
             if self.seastore:
                 ret += ['--seastore']
-                if self.seastore_devices is not []:
-                    ret += ['--seastore-devs', ','.join(self.seastore_devices)]
+                if self.osd_devices is not []:
+                    ret += ['--seastore-devs', ','.join(self.osd_devices)]
+        else:
+            if self.osd_devices is not []:
+                ret += ['--bluestore-devs', ','.join(self.osd_devices)]
         osd_options = ' '.join([f'--{k}={v}' for k, v in self.osd_options.items()])
         if osd_options is not '':
             ret += ['--osd-args', osd_options]

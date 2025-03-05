@@ -2,11 +2,11 @@
 base:
   cluster:
     type: vstart
-    cpuset_base: 16
-    osd_cores: 8
+    cpuset_base: 8
+    osd_cores: 24
     crimson: true
     seastore: true
-    seastore_devices:
+    osd_devices:
     - /dev/nvme0n1
     - /dev/nvme1n1
     - /dev/nvme2n1
