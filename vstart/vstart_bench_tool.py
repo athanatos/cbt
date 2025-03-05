@@ -171,7 +171,7 @@ class VStartCluster(Cluster):
                 'seastore': False,
                 'seastore_devices': [],
                 'num_osds': 1,
-                'vstart_options': {}
+                'osd_options': {}
             },
             conf)
         self.build_directory = os.path.join(self.source_directory, 'build')
@@ -200,8 +200,9 @@ class VStartCluster(Cluster):
                 ret += ['--seastore']
                 if self.seastore_devices is not []:
                     ret += ['--seastore-devs', ','.join(self.seastore_devices)]
-        for k, v in self.vstart_options.items():
-            ret += [f'--{k}', str(v)]
+        osd_options=' '.join([f'--{k}={v}' for k, v in self.osd_options.items()))
+        if osd_options is not '':
+            ret += f"""--osd-args='{osd_options}'"""
         return ret
 
     def get_env(self):
