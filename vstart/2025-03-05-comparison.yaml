@@ -1,0 +1,40 @@
+# try to reproduce 64k seq write regression between b5bae62c0 and 6f43298
+base:
+  cluster:
+    source_directory: /home/sjust/testing-old
+    type: vstart
+    cpuset_base: 16
+    osd_cores: 24
+    osd_devices:
+    - /dev/nvme0n1
+    - /dev/nvme1n1
+    - /dev/nvme2n1
+    - /dev/nvme3n1
+    - /dev/nvme4n1
+    - /dev/nvme5n1
+    - /dev/nvme6n1
+    - /dev/nvme7n1
+    num_osds: 3
+  workload:
+    type: fio_rbd
+    pool_size: 3
+    rbd_size: 50G
+    fio_args:
+      iodepth: 32
+      rw: randwrite 
+      bs: 4096
+      numjobs: 4
+      runtime: 600
+      time_based: 1
+overrides:
+  classic:
+    cluster:
+      crimson: false
+  crimson:
+    cluster:
+      crimson: true
+      seastore: true
+      source_directory: /home/sjust/testing-new
+      osd_options:
+        seastore_max_concurrent_transactions: 128
+        seastore_cache_lru_size: 2G
