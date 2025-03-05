@@ -135,7 +135,9 @@ class Cluster:
             self.cluster_cmd(self.get_rbd_bin(), *args, **kwargs)
 
         def create_pool(self, name, size, pg_num):
-            self.ceph_cmd(['osd', 'pool', 'create', name, pg_num, pg_num, 'size', size], {})
+            self.ceph_cmd(
+                ['osd', 'pool', 'create', name, pg_num, pg_num, '--size', size]
+                , {})
                             
         def create_rbd_image(self, pool, name, size):
             self.rbd_cmd(
