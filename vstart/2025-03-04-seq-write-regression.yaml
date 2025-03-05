@@ -18,12 +18,13 @@ base:
   workload:
     type: fio_rbd
     pool_size: 3
+    rbd_size: 50G
     fio_args:
       iodepth: 32
       rw: write
       bs: 65536
       numjobs: 4
-      runtime: 120
+      runtime: 300
       time_based: 1
 overrides:
 #  old:

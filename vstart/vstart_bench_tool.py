@@ -293,6 +293,7 @@ class FioRBD(Workload):
                 'pool_name': 'test_pool',
                 'num_pgs': 32,
                 'pool_size': 1
+                'rbd_size': '1G'
             },
             conf)
         self.fio_args['ioengine'] = 'rbd'
@@ -326,7 +327,7 @@ class FioRBD(Workload):
                 
     def start(self):
         self.cluster_handle.create_pool(self.pool_name, self.pool_size, self.num_pgs)
-        self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, '1G')
+        self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, self.rbd_size)
         args = get_systemd_run_prefix(self.cpuset) + [self.bin] + \
             self.get_fio_args()
         env = get_merged_env({})
