@@ -134,8 +134,8 @@ class Cluster:
         def rbd_cmd(self, *args, **kwargs):
             self.cluster_cmd(self.get_rbd_bin(), *args, **kwargs)
 
-        def create_pool(self, name, pg_num):
-            self.ceph_cmd(['osd', 'pool', 'create', name, pg_num, pg_num], {})
+        def create_pool(self, name, size, pg_num):
+            self.ceph_cmd(['osd', 'pool', 'create', name, pg_num, pg_num, 'size', size], {})
                             
         def create_rbd_image(self, pool, name, size):
             self.rbd_cmd(
@@ -167,7 +167,8 @@ class VStartCluster(Cluster):
                 'osd_cores': 8,
                 'cpuset': '',
                 'seastore': False,
-                'seastore_device': None,
+                'seastore_devices': [],
+                'num_osds': 1
             },
             conf)
         self.build_directory = os.path.join(self.source_directory, 'build')
@@ -194,15 +195,15 @@ class VStartCluster(Cluster):
             ret += ["--crimson-smp", "{}".format(self.osd_cores)]
             if self.seastore:
                 ret += ['--seastore']
-                if self.seastore_device:
-                    ret += ['--seastore-devs', self.seastore_device]
+                if self.seastore_devices is not []:
+                    ret += ['--seastore-devs', ','.join(self.seastore_devices)]
         return ret
 
     def get_env(self):
         return {
             'MDS': '0',
             'MGR': '1',
-            'OSD': '1',
+            'OSD': str(self.num_osds),
             'MON': '1'
         }
 
@@ -284,7 +285,8 @@ class FioRBD(Workload):
                 'timeout_ratio': 2,
                 'rbd_name': 'test_rbd',
                 'pool_name': 'test_pool',
-                'num_pgs': 32
+                'num_pgs': 32,
+                'pool_size': 1
             },
             conf)
         self.fio_args['ioengine'] = 'rbd'
@@ -317,7 +319,7 @@ class FioRBD(Workload):
         return [get_arg(x) for x in self.fio_args.items()]
                 
     def start(self):
-        self.cluster_handle.create_pool(self.pool_name, self.num_pgs)
+        self.cluster_handle.create_pool(self.pool_name, self.pool_size, self.num_pgs)
         self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, '1G')
         args = get_systemd_run_prefix(self.cpuset) + [self.bin] + \
             self.get_fio_args()

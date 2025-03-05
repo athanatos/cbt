@@ -5,9 +5,19 @@ base:
     cpuset_base: 16
     osd_cores: 8
     crimson: true
-    seastore_device: /dev/nvme0n1
+    seastore_devices:
+    - /dev/nvme0n1
+    - /dev/nvme1n1
+    - /dev/nvme2n1
+    - /dev/nvme3n1
+    - /dev/nvme4n1
+    - /dev/nvme5n1
+    - /dev/nvme6n1
+    - /dev/nvme7n1
+    num_osds: 3
   workload:
     type: fio_rbd
+    pool_size: 3
     fio_args:
       iodepth: 32
       rw: write
