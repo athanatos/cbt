@@ -170,7 +170,7 @@ class VStartCluster(Cluster):
                 'cpuset': '',
                 'seastore': False,
                 'seastore_devices': [],
-                'num_osds': 1
+                'num_osds': 1,
                 'vstart_options': {}
             },
             conf)
