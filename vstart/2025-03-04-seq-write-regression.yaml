@@ -3,7 +3,7 @@ base:
   cluster:
     type: vstart
     cpuset_base: 8
-    osd_cores: 24
+    osd_cores: 8
     crimson: true
     seastore: true
     osd_devices:
