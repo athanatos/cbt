@@ -258,8 +258,18 @@ class VStartCluster(Cluster):
                 f"VStartCluster.start startup process exited with code {startup_process.returncode}")
         
     def stop(self):
+        subprocess.run([ 'pkill', '-9', 'crimson-osd'])
+        subprocess.run([ 'pkill', '-9', 'ceph-osd'])
         stop_process = subprocess.run(
             [ '../src/stop.sh'],
+            cwd = self.build_directory,
+            shell = True,
+            timeout = self.command_timeout)
+        if stop_process.returncode != 0:
+            raise Exception(
+                f"VStartCluster.stop stop process exited with code {stop_process.returncode}")
+        stop_process = subprocess.run(
+            [ '../src/stop.sh', '--crimson'],
             cwd = self.build_directory,
             shell = True,
             timeout = self.command_timeout)
