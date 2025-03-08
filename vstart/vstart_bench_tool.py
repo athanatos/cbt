@@ -193,7 +193,9 @@ class VStartCluster(Cluster):
         }
         if self.cpuset == '':
             self.cpuset = "{}-{}".format(
-                self.cpuset_base, self.cpuset_base + self.osd_cores)
+                self.cpuset_base,
+                self.cpuset_base + (self.osd_cores * self.num_osds)
+            )
 
     def get_output(self):
         return self.output
