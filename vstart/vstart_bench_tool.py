@@ -9,6 +9,7 @@ import re
 import subprocess
 import yaml
 from subprocess import Popen, PIPE
+import logging
 
 """
 General tool for running short tests against single vstart OSDs
@@ -24,6 +25,8 @@ overlay:
   -  
 
 """
+
+logger = logging.getLogger(__name__)
 
 def get_systemd_run_prefix(cpuset):
     if cpuset:
@@ -120,7 +123,8 @@ class Cluster:
             return os.path.join(self.get_bin_directory(), 'rbd')
 
         def cluster_cmd(self, cmd, positional, named):
-            print(f"Handle.cluster_cmd({cmd} {positional} {named})")
+            self.logger.getChild('cluster_cmd').info(
+                f"({cmd} {positional} {named})")
             subprocess.check_output(
                 ([cmd] + \
                  [str(x) for x in positional] +
@@ -171,6 +175,7 @@ class Cluster:
 
 class VStartCluster(Cluster):
     def __init__(self, conf):
+        self.logger = logger.getChild(type(self).__name__)
         set_attr_from_config(
             self,
             {
@@ -232,6 +237,7 @@ class VStartCluster(Cluster):
 
     class Handle(Cluster.Handle):
         def __init__(self, parent):
+            super(self).__init__()
             self.conf_directory = parent.build_directory
             self.bin_directory = parent.bin_directory
 
@@ -249,7 +255,8 @@ class VStartCluster(Cluster):
         self.stop()
         cmdline = get_systemd_run_prefix(self.cpuset) + \
             [ '../src/vstart.sh'] + self.get_args()
-        print("VStartCluster.start: {}".format(" ".join(cmdline)))
+        self.logger.getChild('start').info(
+            " ".join(cmdline))
         startup_process = subprocess.run(
             cmdline,
             env = get_merged_env(self.get_env()),
@@ -309,6 +316,7 @@ class FioRBD(Workload):
             runtime: 120
     """
     def __init__(self, conf, cluster_handle):
+        self.logger = logger.getChild(type(self).__name__)
         set_attr_from_config(
             self,
             {
@@ -358,7 +366,7 @@ class FioRBD(Workload):
         args = get_systemd_run_prefix(self.cpuset) + [self.bin] + \
             self.get_fio_args()
         env = get_merged_env({})
-        print("FioRBD.start args={}, env={}".format(args, env))
+        self.logger.getChild('start').debug("args={}, env={}".format(args, env))
         self.process = subprocess.Popen(
             args, env = env,
             cwd = self.cluster_handle.get_conf_directory(),
@@ -369,6 +377,8 @@ class FioRBD(Workload):
             self.output['results'] = yaml.safe_load(self.process.stdout)
 
 def main():
+    logging.basicConfig(filename='vstart_bench_tool', level=logging.INFO)
+
     parser = argparse.ArgumentParser(
         prog='vstart_bench_tool',
         description='Benchmarks RADOS via vstart')
