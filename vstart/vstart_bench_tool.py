@@ -378,7 +378,7 @@ class FioRBD(Workload):
             self.output['results'] = yaml.safe_load(self.process.stdout)
 
 def main():
-    logging.basicConfig(filename='vstart_bench_tool', level=logging.INFO)
+    logging.basicConfig(filename='vstart_bench_tool', level=logging.DEBUG)
 
     parser = argparse.ArgumentParser(
         prog='vstart_bench_tool',
