@@ -201,6 +201,7 @@ class VStartCluster(Cluster):
                 self.cpuset_base,
                 self.cpuset_base + (self.osd_cores * self.num_osds)
             )
+        self.logger.getChild('__init__').info(f"self.cpuset_base={self.cpuset_base}")
 
     def get_output(self):
         return self.output
