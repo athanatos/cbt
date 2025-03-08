@@ -223,7 +223,7 @@ class VStartCluster(Cluster):
             if self.osd_devices is not []:
                 ret += ['--bluestore-devs', ','.join(self.osd_devices)]
         osd_options = ' '.join([f'--{k}={v}' for k, v in self.osd_options.items()])
-        if osd_options is not '':
+        if osd_options != '':
             ret += ['--osd-args', osd_options]
         return ret
 
