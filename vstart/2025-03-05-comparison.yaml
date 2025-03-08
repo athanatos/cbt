@@ -24,7 +24,7 @@ base:
       rw: randwrite 
       bs: 4096
       numjobs: 4
-      runtime: 600
+      runtime: 120
       time_based: 1
 overrides:
   classic:
