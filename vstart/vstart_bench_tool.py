@@ -237,7 +237,7 @@ class VStartCluster(Cluster):
 
     class Handle(Cluster.Handle):
         def __init__(self, parent):
-            super(self).__init__()
+            super().__init__()
             self.conf_directory = parent.build_directory
             self.bin_directory = parent.bin_directory
 
