@@ -1,4 +1,4 @@
-# try to reproduce 64k seq write regression between b5bae62c0 and 6f43298
+# compare crimson to classic with on randwrite
 base:
   cluster:
     source_directory: /home/sjust/testing-old
