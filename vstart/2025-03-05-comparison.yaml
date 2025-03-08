@@ -4,7 +4,7 @@ base:
     source_directory: /home/sjust/testing-old
     type: vstart
     cpuset_base: 16
-    osd_cores: 24
+    osd_cores: 8
     osd_devices:
     - /dev/nvme0n1
     - /dev/nvme1n1
