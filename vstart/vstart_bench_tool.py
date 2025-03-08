@@ -26,7 +26,7 @@ overlay:
 
 """
 
-logging.basicConfig(filename='vstart_bench_tool', level=logging.DEBUG)
+logging.basicConfig(filename='vstart_bench_tool', level=logging.DEBUG, stream=sys.stderr)
 logger = logging.getLogger(__name__)
 
 def get_systemd_run_prefix(cpuset):
