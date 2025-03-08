@@ -26,6 +26,7 @@ overlay:
 
 """
 
+logging.basicConfig(filename='vstart_bench_tool', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def get_systemd_run_prefix(cpuset):
@@ -378,8 +379,6 @@ class FioRBD(Workload):
             self.output['results'] = yaml.safe_load(self.process.stdout)
 
 def main():
-    logging.basicConfig(filename='vstart_bench_tool', level=logging.DEBUG)
-
     parser = argparse.ArgumentParser(
         prog='vstart_bench_tool',
         description='Benchmarks RADOS via vstart')
