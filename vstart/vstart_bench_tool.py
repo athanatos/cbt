@@ -10,6 +10,7 @@ import subprocess
 import yaml
 from subprocess import Popen, PIPE
 import logging
+import sys
 
 """
 General tool for running short tests against single vstart OSDs
