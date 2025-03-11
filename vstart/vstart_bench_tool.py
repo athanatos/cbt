@@ -292,7 +292,7 @@ class VStartCluster(Cluster):
             try:
                 self.set_osd_cpumask()
                 break
-            except (Exception e):
+            except Exception, e:
                 if time.time() < (time_start + self.startup_timeout):
                     continue
                 else:
