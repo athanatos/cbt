@@ -81,6 +81,12 @@ def get_git_version(path):
             cwd = path
         ).strip(), 'utf-8')
 
+def set_process_cpu_mask(pid, cpumask):
+    logger.getChild('set_process_cpu_mask').debug(
+        f"setting {pid} to {cpumask}")
+    subprocess.check_output(
+        ['taskset', '-p', pid, '-a', '-c', cpumask])
+
 def set_attr_from_config(self, defaults, conf):
     self.conf = {}
     for k in conf:
@@ -254,6 +260,27 @@ class VStartCluster(Cluster):
     def get_handle(self):
         return VStartCluster.Handle(self)
 
+    def get_out_dir(self):
+        return os.path.join(self.build_directory, 'out')
+
+    def set_osd_cpumask(self):
+        def osd_pid_file(osdid):
+            return os.path.join(
+                self.get_out_dir(),
+                f'osd.{osdid}.pid'))
+
+        def get_pid(osdid):
+            with open(osd_pid_file(osdid)) as f:
+                return str(fname.read(), 'utf-8').strip()
+
+        def get_cpumask(base, cores, osdid):
+            returh f"{base + (osdid * cores)}-{base + ((osdid + 1)* cores)}"
+
+        for osdid in range(self.num_osds):
+            set_process_cpu_mask(
+                get_pid(osdid),
+                get_cpumask(self.cpuset_base, self.osd_cores, osdid))
+
     def start(self):
         self.output['git_sha1'] = get_git_version(self.source_directory)
         self.stop()
@@ -269,6 +296,8 @@ class VStartCluster(Cluster):
         if startup_process.returncode != 0:
             raise Exception(
                 f"VStartCluster.start startup process exited with code {startup_process.returncode}")
+
+        self.set_osd_cpumask()
         
     def stop(self):
         subprocess.run([ 'pkill', '-9', 'crimson-osd'])
