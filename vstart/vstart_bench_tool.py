@@ -74,7 +74,7 @@ def set_process_cpu_mask(pid, cpumask):
     logger.getChild('set_process_cpu_mask').debug(
         f"setting {pid} to {cpumask}")
     subprocess.check_output(
-        ['taskset', '-p', pid, '-a', '-c', cpumask])
+        ['taskset', '-a', '-c', '-p', cpumask, pid])
 
 def set_attr_from_config(self, defaults, conf):
     self.conf = {}
