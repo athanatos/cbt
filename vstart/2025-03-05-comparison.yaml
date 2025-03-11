@@ -1,7 +1,7 @@
 # compare crimson to classic with on randwrite
 base:
   cluster:
-    source_directory: /home/sjust/testing-old
+    source_directory: /home/sjust/testing-new
     type: vstart
     cpuset_base: 16
     osd_cores: 8
