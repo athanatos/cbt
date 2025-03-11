@@ -256,7 +256,7 @@ class VStartCluster(Cluster):
         def osd_pid_file(osdid):
             return os.path.join(
                 self.get_out_dir(),
-                f'osd.{osdid}.pid'))
+                f'osd.{osdid}.pid')
 
         def get_pid(osdid):
             with open(osd_pid_file(osdid)) as f:
