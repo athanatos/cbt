@@ -21,7 +21,7 @@ base:
     rbd_size: 50G
     fio_args:
       iodepth: 32
-      rw: randwrite 
+      rw: randread
       bs: 4096
       numjobs: 4
       runtime: 120
