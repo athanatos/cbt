@@ -11,6 +11,7 @@ import yaml
 from subprocess import Popen, PIPE
 import logging
 import sys
+import time
 
 """
 General tool for running short tests against single vstart OSDs
@@ -185,7 +186,8 @@ class VStartCluster(Cluster):
                 'seastore': False,
                 'osd_devices': [],
                 'num_osds': 1,
-                'osd_options': {}
+                'osd_options': {},
+                'startup_timeout': 60
             },
             conf)
         self.build_directory = os.path.join(self.source_directory, 'build')
@@ -271,6 +273,7 @@ class VStartCluster(Cluster):
                 get_cpumask(self.cpuset_base, self.osd_cores, osdid))
 
     def start(self):
+        time_start = time.time()
         self.output['git_sha1'] = get_git_version(self.source_directory)
         self.stop()
         cmdline = [ '../src/vstart.sh'] + self.get_args()
@@ -285,7 +288,15 @@ class VStartCluster(Cluster):
             raise Exception(
                 f"VStartCluster.start startup process exited with code {startup_process.returncode}")
 
-        self.set_osd_cpumask()
+        while time.time() < (time_start + self.startup_timeout):
+            try:
+                self.set_osd_cpumask()
+                break
+            except (Exception e):
+                if time.time() < (time_start + self.startup_timeout):
+                    continue
+                else:
+                    raise e
         
     def stop(self):
         subprocess.run([ 'pkill', '-9', 'crimson-osd'])
