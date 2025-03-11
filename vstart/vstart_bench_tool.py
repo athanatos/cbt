@@ -30,17 +30,6 @@ overlay:
 logging.basicConfig(level=logging.DEBUG, stream=sys.stderr)
 logger = logging.getLogger(__name__)
 
-def get_systemd_run_prefix(cpuset):
-    if cpuset:
-        return [
-            'systemd-run',
-            f"--property=AllowedCPUs='{cpuset}'",
-            '--same-dir',
-            '--user', '--scope', '-G', '--'
-        ]
-    else:
-        return []
-
 def get_merged_env(env):
     return recursive_merge(dict(os.environ), env)
 
@@ -284,8 +273,7 @@ class VStartCluster(Cluster):
     def start(self):
         self.output['git_sha1'] = get_git_version(self.source_directory)
         self.stop()
-        cmdline = get_systemd_run_prefix(self.cpuset) + \
-            [ '../src/vstart.sh'] + self.get_args()
+        cmdline = [ '../src/vstart.sh'] + self.get_args()
         self.logger.getChild('start').info(
             " ".join(cmdline))
         startup_process = subprocess.run(
@@ -396,8 +384,7 @@ class FioRBD(Workload):
     def start(self):
         self.cluster_handle.create_pool(self.pool_name, self.pool_size, self.num_pgs)
         self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, self.rbd_size)
-        args = get_systemd_run_prefix(self.cpuset) + [self.bin] + \
-            self.get_fio_args()
+        args = [self.bin] + self.get_fio_args()
         env = get_merged_env({})
         self.logger.getChild('start').debug("args={}, env={}".format(args, env))
         self.process = subprocess.Popen(
