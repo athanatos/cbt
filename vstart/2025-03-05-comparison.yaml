@@ -30,10 +30,13 @@ overrides:
   classic:
     cluster:
       crimson: false
-  crimson:
+  crimson-seastore:
     cluster:
       crimson: true
       seastore: true
       osd_options:
         seastore_max_concurrent_transactions: 128
         seastore_cache_lru_size: 2G
+  crimson-bluestore:
+    cluster:
+      crimson: true
