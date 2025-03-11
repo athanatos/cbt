@@ -263,7 +263,7 @@ class VStartCluster(Cluster):
                 return str(fname.read(), 'utf-8').strip()
 
         def get_cpumask(base, cores, osdid):
-            returh f"{base + (osdid * cores)}-{base + ((osdid + 1)* cores)}"
+            return f"{base + (osdid * cores)}-{base + ((osdid + 1) * cores)}"
 
         for osdid in range(self.num_osds):
             set_process_cpu_mask(
