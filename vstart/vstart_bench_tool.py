@@ -288,6 +288,7 @@ class VStartCluster(Cluster):
             raise Exception(
                 f"VStartCluster.start startup process exited with code {startup_process.returncode}")
 
+        time.sleep(1)
         while time.time() < (time_start + self.startup_timeout):
             try:
                 self.set_osd_cpumask()
