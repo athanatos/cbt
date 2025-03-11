@@ -260,7 +260,7 @@ class VStartCluster(Cluster):
 
         def get_pid(osdid):
             with open(osd_pid_file(osdid)) as f:
-                return str(fname.read(), 'utf-8').strip()
+                return str(f.read(), 'utf-8').strip()
 
         def get_cpumask(base, cores, osdid):
             return f"{base + (osdid * cores)}-{base + ((osdid + 1) * cores)}"
