@@ -1,0 +1,41 @@
+# test classic with different core counts
+base:
+  cluster:
+    source_directory: /home/sjust/testing-old
+    type: vstart
+    cpuset_base: 16
+    osd_cores: 8
+    osd_devices:
+    - /dev/nvme0n1
+    - /dev/nvme1n1
+    - /dev/nvme2n1
+    - /dev/nvme3n1
+    - /dev/nvme4n1
+    - /dev/nvme5n1
+    - /dev/nvme6n1
+    - /dev/nvme7n1
+    num_osds: 3
+  workload:
+    type: fio_rbd
+    pool_size: 3
+    rbd_size: 50G
+    fio_args:
+      iodepth: 32
+      rw: randwrite 
+      bs: 4096
+      numjobs: 4
+      runtime: 120
+      time_based: 1
+overrides:
+  1-core:
+    cluster:
+      osd_cores: 1
+  2-core:
+    cluster:
+      osd_cores: 2
+  4-core:
+    cluster:
+      osd_cores: 4
+  8-core:
+    cluster:
+      osd_cores: 8
