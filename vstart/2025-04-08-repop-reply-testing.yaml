@@ -30,9 +30,6 @@ overrides:
   baseline:
     cluster:
       source_directory: /home/sjust/baseline
-  pct:
-    cluster:
-      source_directory: /home/sjust/testing-pct
   testing-repop-reply-ordering:
     cluster:
       source_directory: /home/sjust/testing-repop-reply-ordering
