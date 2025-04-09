@@ -14,6 +14,7 @@ base:
     - /dev/nvme6n1
     - /dev/nvme7n1
     crimson: true
+    seastore: true
     num_osds: 3
   workload:
     type: fio_rbd
