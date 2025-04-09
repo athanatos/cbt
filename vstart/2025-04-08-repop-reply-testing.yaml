@@ -28,9 +28,6 @@ base:
       runtime: 120
       time_based: 1
 overrides:
-  baseline:
-    cluster:
-      source_directory: /home/sjust/baseline
   testing-repop-reply-ordering:
     cluster:
       source_directory: /home/sjust/testing-repop-reply-ordering
@@ -40,3 +37,6 @@ overrides:
   testing-repop-reply-ordering-no-repop-reply:
     cluster:
       source_directory: /home/sjust/testing-repop-reply-ordering-no-repop-reply
+  baseline:
+    cluster:
+      source_directory: /home/sjust/baseline
