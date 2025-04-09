@@ -13,7 +13,7 @@ base:
       rw: randread
       bs: 4096
       numjobs: 4
-      runtime: 600
+      runtime: 120
       time_based:
 overrides:
   baseline-8pgs:
