@@ -479,7 +479,8 @@ class Repeat(Workload):
         ret = {}
         for key in keys:
             vals = [s[key] for s in self.summaries]
-            ret[key] = statistics.median(vals)
+            ret[f"{key}_median"] = statistics.median(vals)
+            ret[f"{key}_stddev"] = statistics.stdev(vals)
         return ret
 
 

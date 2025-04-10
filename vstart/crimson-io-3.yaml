@@ -17,7 +17,7 @@ base:
     num_osds: 3
   workload:
     type: repeat
-    runs: 5
+    runs: 10
     workload:
       type: fio_rbd
       pool_size: 3
@@ -34,5 +34,11 @@ overrides:
     cluster:
       source_directory: /home/sjust/testing-repop-reply-ordering
   baseline:
+    cluster:
+      source_directory: /home/sjust/baseline
+  testing-repop-reply-ordering2:
+    cluster:
+      source_directory: /home/sjust/testing-repop-reply-ordering
+  baseline2:
     cluster:
       source_directory: /home/sjust/baseline
