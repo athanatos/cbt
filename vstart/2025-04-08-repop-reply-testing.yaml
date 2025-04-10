@@ -17,7 +17,7 @@ base:
     num_osds: 3
   workload:
     type: repeat
-    num_runs: 5
+    runs: 5
     workload:
       type: fio_rbd
       pool_size: 3
