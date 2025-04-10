@@ -452,13 +452,13 @@ class Repeat(Workload):
             'results': []
         }
         self.summaries = []
-        for workload in self.workloads:
-            workload.start()
-            workload.join()
+        for _ in range(self.runs):
+            self.workload_obj.start()
+            self.workload_obj.join()
             self.output['results'].append(
-                workload.get_output()
+                self.workload_obj.get_output()
             )
-            self.summaries.append(workload.get_summary())
+            self.summaries.append(self.workload_obj.get_summary())
 
     def start(self):
         self.thread = threading.Thread(
