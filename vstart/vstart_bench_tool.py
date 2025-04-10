@@ -439,7 +439,7 @@ class Repeat(Workload):
                 'runs': None,
             },
             conf)
-        self.workload_obj = Workload.make(self.workload, handle)
+        self.workload_obj = Workload.make(self.workload, cluster_handle)
         self.conf = conf
 
     def prepare(self):
