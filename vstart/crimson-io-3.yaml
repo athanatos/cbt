@@ -1,38 +1,38 @@
 base:
   cluster:
     type: vstart
-    cpuset_base: 0
+    cpuset_base: 16
     osd_cores: 8
+    osd_devices:
+    - /dev/nvme0n1
+    - /dev/nvme1n1
+    - /dev/nvme2n1
+    - /dev/nvme3n1
+    - /dev/nvme4n1
+    - /dev/nvme5n1
+    - /dev/nvme6n1
+    - /dev/nvme7n1
     crimson: true
     seastore: true
-    seastore_device: /dev/nvme0n1
+    num_osds: 3
   workload:
-    type: fio_rbd
-    fio_args:
-      iodepth: 32
-      rw: randread
-      bs: 4096
-      numjobs: 4
-      runtime: 120
-      time_based:
+    repeat:
+      runs: 5
+      workload:
+        type: fio_rbd
+        pool_size: 3
+        rbd_size: 50G
+        fio_args:
+        iodepth: 32
+        rw: randwrite
+        bs: 4096
+        numjobs: 4
+        runtime: 30
+        time_based: 1
 overrides:
-  baseline-8pgs:
+  testing-repop-reply-ordering:
+    cluster:
+      source_directory: /home/sjust/testing-repop-reply-ordering
+  baseline:
     cluster:
       source_directory: /home/sjust/baseline
-    workload:
-      num_pgs: 8
-  wip-crimson-io-3-8pgs:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-io-3
-    workload:
-      num_pgs: 8
-  baseline-128pgs:
-    cluster:
-      source_directory: /home/sjust/baseline
-    workload:
-      num_pgs: 128
-  wip-crimson-io-3-128pgs:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-io-3
-    workload:
-      num_pgs: 128

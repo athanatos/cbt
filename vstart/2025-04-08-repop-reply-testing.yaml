@@ -25,7 +25,7 @@ base:
       rw: randwrite 
       bs: 4096
       numjobs: 4
-      runtime: 600
+      runtime: 200
       time_based: 1
 overrides:
   testing-repop-reply-ordering:

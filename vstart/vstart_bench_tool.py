@@ -6,6 +6,7 @@ import os
 import threading
 import time
 import re
+import statistics
 import subprocess
 import yaml
 from subprocess import Popen, PIPE
@@ -320,9 +321,11 @@ class VStartCluster(Cluster):
                 f"VStartCluster.stop stop process exited with code {stop_process.returncode}")
 
 class Workload:
+    def prepare(self): pass
     def start(self): pass
     def join(self): pass
     def get_output(self): pass
+    def get_summary(self): pass
 
     def make(conf, handle):
         wtype = conf.get('type', None)
@@ -330,6 +333,8 @@ class Workload:
         del workload_conf['type']
         if wtype == 'fio_rbd':
             return FioRBD(workload_conf, handle)
+        elif wtype == 'repeat':
+            return Repeat(workload_conf, handle)
         else:
             raise Exception(f"unrecognized cluster.type {wtype}")
 
@@ -377,12 +382,17 @@ class FioRBD(Workload):
             self.timeout = int(self.fio_args['runtime']) * self.timeout_ratio
         except:
             raise Exception("FioRBD: workload.fio_args.runtime required")
-        self.output = {
-            'conf': self.conf
-        }
 
     def get_output(self):
         return self.output
+
+    def get_summary(self):
+        return {
+            'write_iops': self.output['results']['jobs'][0]['write']['iops'],
+            'write_lat_ms': self.output['results']['jobs'][0]['write']['lat_ns']['mean'] / 1000000,
+            'read_iops': self.output['results']['jobs'][0]['read']['iops'],
+            'read_lat_ms': self.output['results']['jobs'][0]['read']['lat_ns']['mean'] / 1000000,
+        }
 
     def get_fio_args(self):
         def get_arg(x):
@@ -393,9 +403,11 @@ class FioRBD(Workload):
                 return f"-{k}={v}"
         return [get_arg(x) for x in self.fio_args.items()]
 
-    def start(self):
+    def prepare(self):
         self.cluster_handle.create_pool(self.pool_name, self.pool_size, self.num_pgs)
         self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, self.rbd_size)
+
+    def start(self):
         args = [self.bin] + self.get_fio_args()
         env = get_merged_env({})
         self.logger.getChild('start').debug("args={}, env={}".format(args, env))
@@ -405,8 +417,70 @@ class FioRBD(Workload):
             stdout = subprocess.PIPE)
 
     def join(self):
-            self.process.wait(self.timeout)
-            self.output['results'] = yaml.safe_load(self.process.stdout)
+        self.process.wait(self.timeout)
+        self.output = {
+            'conf': self.conf
+        }
+        self.output['results'] = yaml.safe_load(self.process.stdout)
+
+
+class Repeat(Workload):
+    """
+    Examples Config
+
+    TODO
+    """
+    def __init__(self, conf, cluster_handle):
+        self.logger = logger.getChild(type(self).__name__)
+        set_attr_from_config(
+            self,
+            {
+                'workload': None,
+                'runs': None,
+            },
+            conf)
+        self.workload_obj = Workload.make(self.workload, handle)
+        self.conf = conf
+
+    def prepare(self):
+        self.workload_obj.prepare()
+
+    def run(self):
+        self.output = {
+            'workload': self.workload,
+            'runs': self.runs,
+            'results': []
+        }
+        self.summaries = []
+        for workload in self.workloads:
+            workload.start()
+            workload.join()
+            self.output['results'].append(
+                workload.get_output()
+            )
+            self.summaries.append(workload.get_summary())
+
+    def start(self):
+        self.thread = threading.Thread(
+            target=self.run,
+        )
+        self.thread.start()
+
+    def join(self):
+        self.thread.join()
+
+    def get_output(self):
+        return self.output
+
+    def get_summary(self):
+        keys = set()
+        for summary in self.summaries:
+            keys |= set(summary.keys())
+        ret = {}
+        for key in keys:
+            vals = [s[key] for s in self.summaries]
+            ret[key] = statistics.median(vals)
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -428,13 +502,15 @@ def main():
         cluster.start()
         
         workload = Workload.make(config.get('workload', {}), cluster.get_handle())
+        workload.prepare()
         workload.start()
         workload.join()
 
         cluster.stop()
         output['name'] = name
         output['cluster'] = cluster.get_output()
-        output['workload'] = workload.get_output()
+        output['workload_raw'] = workload.get_output()
+        output['workload_summary'] = workload.get_summary()
         outputs.append(output)
     results = yaml.dump(outputs)
     print(results)
