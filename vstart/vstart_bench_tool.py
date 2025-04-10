@@ -480,6 +480,7 @@ class Repeat(Workload):
         for key in keys:
             vals = [s[key] for s in self.summaries]
             ret[key] = statistics.median(vals)
+        return ret
 
 
 def main():
