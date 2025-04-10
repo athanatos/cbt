@@ -2,7 +2,6 @@
 base:
   cluster:
     type: vstart
-    cpuset_base: 16
     osd_cores: 8
     osd_devices:
     - /dev/nvme0n1
@@ -17,16 +16,19 @@ base:
     seastore: true
     num_osds: 3
   workload:
-    type: fio_rbd
-    pool_size: 3
-    rbd_size: 50G
-    fio_args:
-      iodepth: 32
-      rw: randwrite 
-      bs: 4096
-      numjobs: 4
-      runtime: 200
-      time_based: 1
+    type: repeat
+    num_runs: 5
+    workload:
+      type: fio_rbd
+      pool_size: 3
+      rbd_size: 50G
+      fio_args:
+        iodepth: 32
+        rw: randwrite 
+        bs: 4096
+        numjobs: 4
+        runtime: 300
+        time_based: 1
 overrides:
   testing-repop-reply-ordering:
     cluster:
