@@ -178,6 +178,7 @@ class VStartCluster(Cluster):
         set_attr_from_config(
             self,
             {
+                'setcpumask': False,
                 'source_directory': None,
                 'command_timeout': 120,
                 'crimson': False,
@@ -290,15 +291,16 @@ class VStartCluster(Cluster):
                 f"VStartCluster.start startup process exited with code {startup_process.returncode}")
 
         time.sleep(1)
-        while time.time() < (time_start + self.startup_timeout):
-            try:
-                self.set_osd_cpumask()
-                break
-            except Exception as e:
-                if time.time() < (time_start + self.startup_timeout):
-                    continue
-                else:
-                    raise e
+        if self.setcpumask:
+            while time.time() < (time_start + self.startup_timeout):
+                try:
+                    self.set_osd_cpumask()
+                    break
+                except Exception as e:
+                    if time.time() < (time_start + self.startup_timeout):
+                        continue
+                    else:
+                        raise e
         
     def stop(self):
         subprocess.run([ 'pkill', '-9', 'crimson-osd'])
