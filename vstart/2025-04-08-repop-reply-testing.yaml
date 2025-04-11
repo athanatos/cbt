@@ -16,29 +16,26 @@ base:
     seastore: true
     num_osds: 3
   workload:
-    type: repeat
-    runs: 5
-    workload:
-      type: fio_rbd
-      pool_size: 3
-      rbd_size: 50G
-      fio_args:
-        iodepth: 32
-        rw: randwrite 
-        bs: 4096
-        numjobs: 4
-        runtime: 300
-        time_based: 1
+    type: fio_rbd
+    pool_size: 3
+    rbd_size: 50G
+    fio_args:
+      iodepth: 32
+      rw: randwrite 
+      bs: 4096
+      numjobs: 4
+      runtime: 300
+      time_based: 1
 overrides:
   testing-repop-reply-ordering:
     cluster:
       source_directory: /home/sjust/testing-repop-reply-ordering
-  testing-repop-reply-ordering-no-repop:
+  testing-repop-reply-ordering2:
     cluster:
-      source_directory: /home/sjust/testing-repop-reply-ordering-no-repop
-  testing-repop-reply-ordering-no-repop-reply:
-    cluster:
-      source_directory: /home/sjust/testing-repop-reply-ordering-no-repop-reply
+      source_directory: /home/sjust/testing-repop-reply-ordering
   baseline:
+    cluster:
+      source_directory: /home/sjust/baseline
+  baseline2:
     cluster:
       source_directory: /home/sjust/baseline
