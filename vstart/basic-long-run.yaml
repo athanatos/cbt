@@ -1,0 +1,32 @@
+# run workload for an hour
+base:
+  cluster:
+    type: vstart
+    osd_cores: 8
+    osd_devices:
+    - /dev/nvme0n1
+    - /dev/nvme1n1
+    - /dev/nvme2n1
+    - /dev/nvme3n1
+    - /dev/nvme4n1
+    - /dev/nvme5n1
+    - /dev/nvme6n1
+    - /dev/nvme7n1
+    crimson: true
+    seastore: true
+    num_osds: 3
+  workload:
+    type: fio_rbd
+    pool_size: 3
+    rbd_size: 50G
+    fio_args:
+      iodepth: 32
+      rw: randwrite 
+      bs: 4096
+      numjobs: 4
+      runtime: 3600
+      time_based: 1
+overrides:
+  baseline:
+    cluster:
+      source_directory: /home/sjust/baseline
