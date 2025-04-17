@@ -519,7 +519,7 @@ class PerfMonitor:
     def join():
         pass
 
-    def make(self, conf, *args):
+    def make(conf, *args):
         wtype = conf.get('type', None)
         confcopy = copy.deepcopy(conf)
         del workload_conf['type']
