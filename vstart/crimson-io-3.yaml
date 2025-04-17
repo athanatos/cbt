@@ -27,9 +27,13 @@ base:
       runtime: 30
       time_based: 1
 overrides:
-  baseline:
-    cluster:
-      source_directory: /home/sjust/baseline
-  crimson-perf:
+  crimson-perf-1G:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
+      osd_options:
+        seastore_cache_lru_size: 1G
+  crimson-perf-10G:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+      osd_options:
+        seastore_cache_lru_size: 10G
