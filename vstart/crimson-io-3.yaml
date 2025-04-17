@@ -27,11 +27,6 @@ base:
       runtime: 200
       time_based: 1
 overrides:
-  crimson-perf-1G:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        seastore_cache_lru_size: 1G
   crimson-perf-2G:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
@@ -42,3 +37,8 @@ overrides:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_cache_lru_size: 3G
+  crimson-perf-1G:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+      osd_options:
+        seastore_cache_lru_size: 1G
