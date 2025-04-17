@@ -535,6 +535,7 @@ class Perf(PerfMonitor):
     - type: perf
     """
     def __init__(self, conf, handle, output_path, name):
+        self.logger = logger.getChild(type(self).__name__)
         self.conf = conf
         self.handle = handle
         self.output_path = output_path
@@ -554,6 +555,9 @@ class Perf(PerfMonitor):
                 '-o', self.get_filename(osd),
                 '--', 'sleep', '10'
             ]
+            self.logger.getChild('start').info(
+                f"starting perf for osd {osd}: {args}")
+
             self.processes[osd] = subprocess.Popen(
                 args,
                 cwd = self.output_path,
