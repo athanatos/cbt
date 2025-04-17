@@ -17,7 +17,7 @@ base:
     num_osds: 3
   workload:
     type: repeat
-    runs: 10
+    runs: 3
     workload:
       type: fio_rbd
       pool_size: 3
@@ -33,12 +33,6 @@ overrides:
   baseline:
     cluster:
       source_directory: /home/sjust/baseline
-  baseline2:
+  crimson-perf:
     cluster:
-      source_directory: /home/sjust/baseline
-  baseline3:
-    cluster:
-      source_directory: /home/sjust/baseline
-  baseline4:
-    cluster:
-      source_directory: /home/sjust/baseline
+      source_directory: /home/sjust/wip-crimson-perf

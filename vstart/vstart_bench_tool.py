@@ -241,14 +241,19 @@ class VStartCluster(Cluster):
     class Handle(Cluster.Handle):
         def __init__(self, parent):
             self.logger = logger.getChild(f"{type(parent).__name__}.{type(self).__name__}")
-            self.conf_directory = parent.build_directory
-            self.bin_directory = parent.bin_directory
+            self.parent = parent
 
         def get_conf_directory(self):
-            return self.conf_directory
+            return self.parent.conf_directory
 
         def get_bin_directory(self):
-            return self.bin_directory
+            return self.parent.bin_directory
+
+        def get_osd_pid(self, osdid):
+            return self.parent.get_osd_pid(osdid)
+
+        def get_osds():
+            return range(self.num_osds)
 
     def get_handle(self):
         return VStartCluster.Handle(self)
@@ -256,22 +261,22 @@ class VStartCluster(Cluster):
     def get_out_dir(self):
         return os.path.join(self.build_directory, 'out')
 
-    def set_osd_cpumask(self):
+    def get_osd_pid(self, osdid):
         def osd_pid_file(osdid):
             return os.path.join(
                 self.get_out_dir(),
                 f'osd.{osdid}.pid')
+        with open(osd_pid_file(osdid)) as f:
+            return f.read().strip()
 
-        def get_pid(osdid):
-            with open(osd_pid_file(osdid)) as f:
-                return f.read().strip()
 
+    def set_osd_cpumask(self):
         def get_cpumask(base, cores, osdid):
             return f"{base + (osdid * cores)}-{base + ((osdid + 1) * cores)}"
 
         for osdid in range(self.num_osds):
             set_process_cpu_mask(
-                get_pid(osdid),
+                self.get_osd_pid(osdid),
                 get_cpumask(self.cpuset_base, self.osd_cores, osdid))
 
     def start(self):
@@ -322,12 +327,14 @@ class VStartCluster(Cluster):
             raise Exception(
                 f"VStartCluster.stop stop process exited with code {stop_process.returncode}")
 
+
 class Workload:
     def prepare(self): pass
     def start(self): pass
     def join(self): pass
     def get_output(self): pass
     def get_summary(self): pass
+    def get_estimated_runtime(self): pass
 
     def make(conf, handle):
         wtype = conf.get('type', None)
@@ -339,6 +346,7 @@ class Workload:
             return Repeat(workload_conf, handle)
         else:
             raise Exception(f"unrecognized cluster.type {wtype}")
+
 
 class FioRBD(Workload):
     """
@@ -385,6 +393,9 @@ class FioRBD(Workload):
         except:
             raise Exception("FioRBD: workload.fio_args.runtime required")
 
+    def get_estimated_runtime(self):
+        return self.fio_args['runtime']
+
     def get_output(self):
         return self.output
 
@@ -428,9 +439,20 @@ class FioRBD(Workload):
 
 class Repeat(Workload):
     """
-    Examples Config
+    Example config:
 
-    TODO
+    workload:
+        type: Repeat
+        runs: 3
+        workload:
+          bin: fio
+          num_pgs: 32
+          fio_args:
+              iodepth: 32
+              rw: randread
+              bs: 4096
+              numjobs: 4 
+              runtime: 120
     """
     def __init__(self, conf, cluster_handle):
         self.logger = logger.getChild(type(self).__name__)
@@ -443,6 +465,9 @@ class Repeat(Workload):
             conf)
         self.workload_obj = Workload.make(self.workload, cluster_handle)
         self.conf = conf
+
+    def get_estimated_runtime(self):
+        return self.workload_obj.get_estimated_runtime() * self.runs
 
     def prepare(self):
         self.workload_obj.prepare()
@@ -487,6 +512,59 @@ class Repeat(Workload):
         return ret
 
 
+class PerfMonitor:
+    def start():
+        pass
+
+    def join():
+        pass
+
+    def make(self, conf, *args):
+        wtype = conf.get('type', None)
+        confcopy = copy.deepcopy(conf)
+        del workload_conf['type']
+        if wtype == 'perf':
+            return Perf(confcopy, *args)
+        else:
+            raise Exception(f"unrecognized cluster.type {wtype}")
+
+
+class Perf(PerfMonitor):
+    """
+    perfmonitors:
+    - type: perf
+    """
+    def __init__(self, conf, handle, output_path, name):
+        self.conf = conf
+        self.handle = handle
+        self.output_path = output_path
+        self.name = name
+
+    def get_filename(osd):
+        return os.path.join(
+            self.output_path,
+            f"{self.name}-{osd}-perf.data")
+
+    def start():
+        for osd in self.handle.get_osds():
+            args = [
+                'perf', 'record', '-g', '--call-graph', 'lbr',
+                '-p', self.handle.get_osd_pid(osd),
+                '-o', self.get_filename(),
+                '--', 'sleep', '10'
+            ]
+            self.processes[osd] = subprocess.Popen(
+                args,
+                cwd = self.output_path,
+                stdout = subprocess.PIPE,
+                shell = True
+            )
+
+    def join():
+        for _, proc in self.processes.items():
+        self.process.wait(10)
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog='vstart_bench_tool',
@@ -497,7 +575,16 @@ def main():
     parser.add_argument(
         '-o', '--output', help='path for results', required=False
     )
+    parser.add_argument(
+        '-p', '--perf-dir', help='path for perf output', required=False
+    )
     args = parser.parse_args()
+
+    if not args.output and args.perf_dir:
+        args.output = os.path.join(args.perf_dir, 'summary.yaml')
+
+    if args.perf_dir:
+        os.mkdir(args.perf_dir)
 
     outputs = []
     for name, override, base, config in read_configs(args.config):
@@ -509,6 +596,20 @@ def main():
         workload = Workload.make(config.get('workload', {}), cluster.get_handle())
         workload.prepare()
         workload.start()
+
+        est_completion = time.monotonic() + workload.get_estimated_runtime()
+        perfmonitors = [
+            PerfMonitor.make(i, cluster.get_handle(), args.perf_dir, name)
+            for i in config.get('perfmonitors', [])
+        ]
+        if perfmonitors and not args.perf_dir:
+            raise Exception("Must specify -p, --perf-dir for PerfMonitors")
+        for perfmonitor in perfmonitors:
+            perfmonitor.start()
+        time.sleep(est_completion - time.monotonic())
+        for perfmonitor in perfmonitors:
+            perfmonitor.join()
+
         workload.join()
 
         cluster.stop()
