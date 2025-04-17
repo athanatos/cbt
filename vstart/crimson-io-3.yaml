@@ -24,7 +24,7 @@ base:
       rw: randwrite
       bs: 4096
       numjobs: 4
-      runtime: 30
+      runtime: 200
       time_based: 1
 overrides:
   crimson-perf-1G:
@@ -32,6 +32,11 @@ overrides:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_cache_lru_size: 1G
+  crimson-perf-5G:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+      osd_options:
+        seastore_cache_lru_size: 5G
   crimson-perf-10G:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
