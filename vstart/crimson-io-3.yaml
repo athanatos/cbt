@@ -32,13 +32,13 @@ overrides:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_cache_lru_size: 1G
-  crimson-perf-5G:
+  crimson-perf-2G:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
-        seastore_cache_lru_size: 5G
-  crimson-perf-10G:
+        seastore_cache_lru_size: 2G
+  crimson-perf-3G:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
-        seastore_cache_lru_size: 10G
+        seastore_cache_lru_size: 3G
