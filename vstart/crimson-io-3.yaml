@@ -16,19 +16,16 @@ base:
     seastore: true
     num_osds: 3
   workload:
-    type: repeat
-    runs: 3
-    workload:
-      type: fio_rbd
-      pool_size: 3
-      rbd_size: 50G
-      fio_args:
-        iodepth: 32
-        rw: randwrite
-        bs: 4096
-        numjobs: 4
-        runtime: 30
-        time_based: 1
+    type: fio_rbd
+    pool_size: 3
+    rbd_size: 50G
+    fio_args:
+      iodepth: 32
+      rw: randwrite
+      bs: 4096
+      numjobs: 4
+      runtime: 30
+      time_based: 1
 overrides:
   baseline:
     cluster:
