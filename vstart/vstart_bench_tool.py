@@ -561,7 +561,6 @@ class Perf(PerfMonitor):
             self.processes[osd] = subprocess.Popen(
                 args,
                 cwd = self.output_path,
-                stdout = subprocess.PIPE,
                 shell = True
             )
 
