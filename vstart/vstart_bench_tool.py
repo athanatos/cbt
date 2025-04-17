@@ -546,6 +546,7 @@ class Perf(PerfMonitor):
             f"{self.name}-{osd}-perf.data")
 
     def start(self):
+        self.processes = {}
         for osd in self.handle.get_osds():
             args = [
                 'perf', 'record', '-g', '--call-graph', 'lbr',
