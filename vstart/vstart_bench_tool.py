@@ -244,7 +244,7 @@ class VStartCluster(Cluster):
             self.parent = parent
 
         def get_conf_directory(self):
-            return self.parent.conf_directory
+            return self.parent.build_directory
 
         def get_bin_directory(self):
             return self.parent.bin_directory
