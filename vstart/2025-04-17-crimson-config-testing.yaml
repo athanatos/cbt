@@ -42,7 +42,12 @@ overrides:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_data_delta_based_overwrite: 16384
-        seastore_obj_data_write_amplification: 1000
+  both:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+      osd_options:
+        seastore_main_device_type: RANDOM_BLOCK_SSD
+        seastore_data_delta_based_overwrite: 16384
   normal:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
