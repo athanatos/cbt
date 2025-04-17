@@ -550,7 +550,7 @@ class Perf(PerfMonitor):
             args = [
                 'perf', 'record', '-g', '--call-graph', 'lbr',
                 '-p', self.handle.get_osd_pid(osd),
-                '-o', self.get_filename(),
+                '-o', self.get_filename(osd),
                 '--', 'sleep', '10'
             ]
             self.processes[osd] = subprocess.Popen(
