@@ -543,7 +543,6 @@ class Perf(PerfMonitor):
 
     def get_filename(self, osd):
         return os.path.join(
-            self.output_path,
             f"{self.name}-{osd}-perf.data")
 
     def start(self):
@@ -556,7 +555,7 @@ class Perf(PerfMonitor):
                 '--', 'sleep', '10'
             ]
             self.logger.getChild('start').info(
-                f"starting perf for osd {osd}: {args}")
+                f"starting perf for osd {osd}: {' '.join(args)}")
 
             self.processes[osd] = subprocess.Popen(
                 args,
