@@ -560,7 +560,6 @@ class Perf(PerfMonitor):
             self.processes[osd] = subprocess.Popen(
                 args,
                 cwd = self.output_path,
-                shell = True
             )
 
     def join(self):
