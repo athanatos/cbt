@@ -252,7 +252,7 @@ class VStartCluster(Cluster):
         def get_osd_pid(self, osdid):
             return self.parent.get_osd_pid(osdid)
 
-        def get_osds():
+        def get_osds(self):
             return range(self.num_osds)
 
     def get_handle(self):
