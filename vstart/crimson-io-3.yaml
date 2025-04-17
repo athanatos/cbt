@@ -15,6 +15,8 @@ base:
     crimson: true
     seastore: true
     num_osds: 3
+    osd_options:
+      seastore_cache_lru_size: 1G
   workload:
     type: fio_rbd
     pool_size: 3
@@ -26,19 +28,9 @@ base:
       numjobs: 4
       runtime: 200
       time_based: 1
+  perfmonitors:
+  - type: perf
 overrides:
-  crimson-perf-2G:
+  crimson-perf:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        seastore_cache_lru_size: 2G
-  crimson-perf-3G:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        seastore_cache_lru_size: 3G
-  crimson-perf-1G:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        seastore_cache_lru_size: 1G
