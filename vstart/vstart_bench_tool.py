@@ -513,10 +513,10 @@ class Repeat(Workload):
 
 
 class PerfMonitor:
-    def start():
+    def start(self):
         pass
 
-    def join():
+    def join(self):
         pass
 
     def make(conf, *args):
@@ -540,12 +540,12 @@ class Perf(PerfMonitor):
         self.output_path = output_path
         self.name = name
 
-    def get_filename(osd):
+    def get_filename(self, osd):
         return os.path.join(
             self.output_path,
             f"{self.name}-{osd}-perf.data")
 
-    def start():
+    def start(self):
         for osd in self.handle.get_osds():
             args = [
                 'perf', 'record', '-g', '--call-graph', 'lbr',
@@ -560,7 +560,7 @@ class Perf(PerfMonitor):
                 shell = True
             )
 
-    def join():
+    def join(self):
         for _, proc in self.processes.items():
             proc.wait(10)
 
