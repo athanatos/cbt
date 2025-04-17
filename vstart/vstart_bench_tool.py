@@ -562,8 +562,7 @@ class Perf(PerfMonitor):
 
     def join():
         for _, proc in self.processes.items():
-        self.process.wait(10)
-
+            proc.wait(10)
 
 def main():
     parser = argparse.ArgumentParser(
