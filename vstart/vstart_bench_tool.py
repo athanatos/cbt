@@ -522,7 +522,7 @@ class PerfMonitor:
     def make(conf, *args):
         wtype = conf.get('type', None)
         confcopy = copy.deepcopy(conf)
-        del workload_conf['type']
+        del confcopy['type']
         if wtype == 'perf':
             return Perf(confcopy, *args)
         else:
