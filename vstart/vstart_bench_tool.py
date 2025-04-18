@@ -598,6 +598,7 @@ class Counters(PerfMonitor):
             f"{self.name}-counters.yaml")
 
     def start(self):
+        ret = {}
         for osd in self.handle.get_osds():
             ret[osd] = {}
             ret[osd]['perfcounters_dump'] = self.handle.run_osd_asok(
