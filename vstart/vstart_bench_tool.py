@@ -600,6 +600,8 @@ class Counters(PerfMonitor):
     def start(self):
         ret = {}
         for osd in self.handle.get_osds():
+            self.logger.getChild('start').info(
+                f"about to dump metrics for osd {osd}")
             ret[osd] = {}
             ret[osd]['perfcounters_dump'] = self.handle.run_osd_asok_decode(
                 osd, ['perfcounters_dump'])
