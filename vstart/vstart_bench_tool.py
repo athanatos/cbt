@@ -257,7 +257,7 @@ class VStartCluster(Cluster):
 
         def run_osd_asok(self, osd, args):
             return subprocess.Popen(
-                [self.get_ceph_bin(), 'daemon', f"osd.{osd}"] + args
+                [self.get_ceph_bin(), 'daemon', f"osd.{osd}"] + args,
                 cwd = self.cluster_handle.get_conf_directory(),
                 stdout = subprocess.PIPE)
 
