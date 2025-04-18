@@ -30,6 +30,7 @@ base:
       time_based: 1
   perfmonitors:
   - type: perf
+  - type: counters
 overrides:
   crimson-perf:
     cluster:

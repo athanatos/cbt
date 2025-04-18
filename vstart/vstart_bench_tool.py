@@ -255,6 +255,17 @@ class VStartCluster(Cluster):
         def get_osds(self):
             return range(self.parent.num_osds)
 
+        def run_osd_asok(self, osd, args):
+            return subprocess.Popen(
+                [self.get_ceph_bin(), 'daemon', f"osd.{osd}"] + args
+                cwd = self.cluster_handle.get_conf_directory(),
+                stdout = subprocess.PIPE)
+
+        def run_osd_asok_decode(self, *args)
+            process = self.run_osd_asok(*args)
+            process.wait()
+            return yaml.safe_load(process.stdout)
+
     def get_handle(self):
         return VStartCluster.Handle(self)
 
@@ -525,6 +536,8 @@ class PerfMonitor:
         del confcopy['type']
         if wtype == 'perf':
             return Perf(confcopy, *args)
+        elif wtype == 'counters':
+            return Counters(confcopy, *args)
         else:
             raise Exception(f"unrecognized cluster.type {wtype}")
 
@@ -565,6 +578,37 @@ class Perf(PerfMonitor):
     def join(self):
         for _, proc in self.processes.items():
             proc.wait(10)
+
+
+class Perf(PerfMonitor):
+    """
+    perfmonitors:
+    - type: counters 
+    """
+    def __init__(self, conf, handle, output_path, name):
+        self.logger = logger.getChild(type(self).__name__)
+        self.conf = conf
+        self.handle = handle
+        self.output_path = output_path
+        self.name = name
+
+    def get_filename(self):
+        return os.path.join(
+            self.output_path,
+            f"{self.name}-counters.yaml")
+
+    def start(self):
+        for osd in self.handle.get_osds():
+            ret[osd] = {}
+            ret[osd]['perfcounters_dump'] = self.handle.run_osd_asok(
+                ['perfcounters_dump'])
+            ret[osd]['dump_metrics'] = self.handle.run_osd_asok(
+                ['dump_metrics'])
+        with open(self.get_filename(osd), 'w') as f:
+            f.write(yaml.dump(ret))
+
+    def join(self):
+        pass
 
 def main():
     parser = argparse.ArgumentParser(
