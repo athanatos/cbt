@@ -39,8 +39,8 @@ overrides:
   node:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
-      balance_cpu: node
+      crimson_balance_cpu: node
   osd:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
-      balance_cpu: osd 
+      crimson_balance_cpu: osd 
