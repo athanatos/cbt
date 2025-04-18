@@ -266,9 +266,10 @@ class VStartCluster(Cluster):
         def run_osd_asok_decode(self, osd, args):
             self.logger.getChild('run_osd_asok').info(f"osd.{osd} args {' '.join(args)}")
             process = self.run_osd_asok(osd, args)
+            ret = yaml.safe_load(process.stdout)
             process.wait()
             self.logger.getChild('run_osd_asok').info(f"osd.{osd} args {' '.join(args)} wait complete")
-            return yaml.safe_load(process.stdout)
+            return ret
 
     def get_handle(self):
         return VStartCluster.Handle(self)
