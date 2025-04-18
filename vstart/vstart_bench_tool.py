@@ -256,7 +256,7 @@ class VStartCluster(Cluster):
             return range(self.parent.num_osds)
 
         def run_osd_asok(self, osd, in_args):
-            args = [self.get_ceph_bin(), 'daemon', f"osd.{osd}"] + in_args]
+            args = [self.get_ceph_bin(), 'daemon', f"osd.{osd}"] + in_args
             self.logger.child('run_osd_asok').info(f"args {' '.join(args)}")
             return subprocess.Popen(
                 args,
