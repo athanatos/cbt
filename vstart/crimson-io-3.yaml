@@ -29,7 +29,7 @@ base:
       runtime: 200
       time_based: 1
   perfmonitors:
-  - type: perf
+#  - type: perf
   - type: counters
 overrides:
   crimson-perf:
