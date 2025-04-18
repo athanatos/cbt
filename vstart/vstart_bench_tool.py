@@ -609,7 +609,7 @@ class Counters(PerfMonitor):
                 #osd, ['dump_metrics'])
         self.logger.getChild('start').info(
             f"ret {yaml.dump(ret)}")
-        with open(self.get_filename(osd), 'w') as f:
+        with open(self.get_filename(), 'w') as f:
             f.write(yaml.dump(ret))
 
     def join(self):
