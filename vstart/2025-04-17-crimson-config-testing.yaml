@@ -39,13 +39,28 @@ overrides:
 #        seastore_main_device_type: RANDOM_BLOCK_SSD
   no-core-0:
     cluster:
-      osd_cores: 9
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         crimson_osd_min_pg_core: 1
+  128pgs:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+    workload:
+      num_pgs: 128
+  512pgs:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+    workload:
+      num_pgs: 512
+  no-core-0-512pgs:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+      osd_options:
+        crimson_osd_min_pg_core: 1
+    workload:
+      num_pgs: 512
 #  both:
 #    cluster:
-#      osd_cores: 9
 #      source_directory: /home/sjust/wip-crimson-perf
 #      osd_options:
 #        crimson_osd_min_pg_core: 1
