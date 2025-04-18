@@ -32,24 +32,24 @@ base:
 #  - type: perf
   - type: counters
 overrides:
-  randblock:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        seastore_main_device_type: RANDOM_BLOCK_SSD
+#  randblock:
+#    cluster:
+#      source_directory: /home/sjust/wip-crimson-perf
+#      osd_options:
+#        seastore_main_device_type: RANDOM_BLOCK_SSD
   no-core-0:
     cluster:
       osd_cores: 9
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         crimson_osd_min_pg_core: 1
-  both:
-    cluster:
-      osd_cores: 9
-      source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        crimson_osd_min_pg_core: 1
-        seastore_main_device_type: RANDOM_BLOCK_SSD
+#  both:
+#    cluster:
+#      osd_cores: 9
+#      source_directory: /home/sjust/wip-crimson-perf
+#      osd_options:
+#        crimson_osd_min_pg_core: 1
+#        seastore_main_device_type: RANDOM_BLOCK_SSD
   normal:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
