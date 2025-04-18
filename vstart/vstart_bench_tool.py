@@ -580,7 +580,7 @@ class Perf(PerfMonitor):
             proc.wait(10)
 
 
-class Perf(PerfMonitor):
+class Counters(PerfMonitor):
     """
     perfmonitors:
     - type: counters 
