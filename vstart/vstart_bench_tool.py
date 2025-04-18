@@ -261,7 +261,7 @@ class VStartCluster(Cluster):
                 cwd = self.cluster_handle.get_conf_directory(),
                 stdout = subprocess.PIPE)
 
-        def run_osd_asok_decode(self, *args)
+        def run_osd_asok_decode(self, *args):
             process = self.run_osd_asok(*args)
             process.wait()
             return yaml.safe_load(process.stdout)
