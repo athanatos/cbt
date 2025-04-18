@@ -31,23 +31,26 @@ base:
         numjobs: 4
         runtime: 60
         time_based: 1
+  perfmonitors:
+#  - type: perf
+  - type: counters
 overrides:
   randblock:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
-  delta:
+  randblock:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
-        seastore_data_delta_based_overwrite: 16384
+        crimson_osd_min_pg_core: 1
   both:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
+        crimson_osd_min_pg_core: 1
         seastore_main_device_type: RANDOM_BLOCK_SSD
-        seastore_data_delta_based_overwrite: 16384
   normal:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
