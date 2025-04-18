@@ -660,7 +660,7 @@ def main():
             raise Exception("Must specify -p, --perf-dir for PerfMonitors")
         for perfmonitor in perfmonitors:
             perfmonitor.start()
-        time.sleep(est_completion - time.monotonic())
+        time.sleep(max(0, est_completion - time.monotonic()))
         for perfmonitor in perfmonitors:
             perfmonitor.join()
 
