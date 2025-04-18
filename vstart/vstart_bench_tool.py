@@ -601,10 +601,10 @@ class Counters(PerfMonitor):
         ret = {}
         for osd in self.handle.get_osds():
             ret[osd] = {}
-            ret[osd]['perfcounters_dump'] = self.handle.run_osd_asok(
-                ['perfcounters_dump'])
-            ret[osd]['dump_metrics'] = self.handle.run_osd_asok(
-                ['dump_metrics'])
+            ret[osd]['perfcounters_dump'] = self.handle.run_osd_asok_decode(
+                osd, ['perfcounters_dump'])
+            ret[osd]['dump_metrics'] = self.handle.run_osd_asok_decode(
+                osd, ['dump_metrics'])
         with open(self.get_filename(osd), 'w') as f:
             f.write(yaml.dump(ret))
 
