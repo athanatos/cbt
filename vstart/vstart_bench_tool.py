@@ -257,15 +257,17 @@ class VStartCluster(Cluster):
 
         def run_osd_asok(self, osd, in_args):
             args = [self.get_ceph_bin(), 'daemon', f"osd.{osd}"] + in_args
-            self.logger.getChild('run_osd_asok').info(f"args {' '.join(args)}")
+            self.logger.getChild('run_osd_asok').info(f"osd.{osd} args {' '.join(args)}")
             return subprocess.Popen(
                 args,
                 cwd = self.get_conf_directory(),
                 stdout = subprocess.PIPE)
 
-        def run_osd_asok_decode(self, *args):
+        def run_osd_asok_decode(self, osd, args):
+            self.logger.getChild('run_osd_asok').info(f"osd.{osd} args {' '.join(args)}")
             process = self.run_osd_asok(*args)
             process.wait()
+            self.logger.getChild('run_osd_asok').info(f"osd.{osd} args {' '.join(args)} wait complete")
             return yaml.safe_load(process.stdout)
 
     def get_handle(self):
