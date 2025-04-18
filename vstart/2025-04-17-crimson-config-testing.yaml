@@ -40,7 +40,7 @@ overrides:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
-  randblock:
+  no-core-0:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
