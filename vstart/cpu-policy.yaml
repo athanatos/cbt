@@ -36,10 +36,10 @@ overrides:
   normal:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
-  node:
+  socket:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
-      crimson_balance_cpu: node
+      crimson_balance_cpu: socket
   osd:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
