@@ -221,12 +221,12 @@ class VStartCluster(Cluster):
             ret += ["--crimson-smp", "{}".format(self.osd_cores)]
             if self.seastore:
                 ret += ['--seastore']
-                if self.osd_devices is not []:
+                if self.osd_devices != []:
                     ret += ['--seastore-devs', ','.join(self.osd_devices)]
-            if self.crimson_balance_cpu is not '':
+            if self.crimson_balance_cpu != '':
                 ret += ['--crimson-balance-cpu', self.crimson_balance_cpu]
         else:
-            if self.osd_devices is not []:
+            if self.osd_devices != []:
                 ret += ['--bluestore-devs', ','.join(self.osd_devices)]
         osd_options = ' '.join([f'--{k}={v}' for k, v in self.osd_options.items()])
         if osd_options != '':
