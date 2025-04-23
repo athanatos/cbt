@@ -487,7 +487,7 @@ class FioRBD(Workload):
             args = [self.bin] + get_fio_arg_list(self.get_fio_args(clientid))
             env = get_merged_env({})
             self.logger.getChild('start').debug(f"args={args}")
-            self.process = subprocess.Popen(
+            return subprocess.Popen(
                 args, env = env,
                 cwd = self.cluster_handle.get_conf_directory(),
                 stdout = subprocess.PIPE)
