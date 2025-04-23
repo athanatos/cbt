@@ -20,6 +20,7 @@ base:
     pool_size: 3
     rbd_size: 50G
     num_pgs: 512
+    num_clients: 4
     fio_args:
       iodepth: 32
       rw: randwrite 
