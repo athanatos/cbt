@@ -17,7 +17,7 @@ base:
     num_osds: 3
   workload:
     type: fio_rbd
-    pool_size: 3
+    pool_size: 1
     rbd_size: 10G
     num_pgs: 512
     num_clients: 32
