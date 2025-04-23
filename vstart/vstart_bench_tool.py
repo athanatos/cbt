@@ -474,7 +474,7 @@ class FioRBD(Workload):
         logger.debug("prepare complete")
 
     def start(self):
-        def get_fio_arg_list(self, fio_args):
+        def get_fio_arg_list(fio_args):
             def get_arg(x):
                 k, v = x
                 if v is None:
