@@ -469,7 +469,7 @@ class FioRBD(Workload):
             threading.Thread(target=lambda: make_image(x))
             for x in range(self.num_clients)
         ]
-        [t.run() for t in threads]
+        [t.start() for t in threads]
         [t.join() for t in threads]
         logger.debug("prepare complete")
 
