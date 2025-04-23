@@ -36,21 +36,25 @@ overrides:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       crimson_balance_cpu: none
-    osd_options:
-      seastore_cache_lru_size: 1G
+      osd_options:
+        seastore_cache_lru_size: 1G
   transactions128:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       crimson_balance_cpu: none
-    osd_options:
-      seastore_max_concurrent_transactions: 128
-  neither:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-perf
-  both:
+      osd_options:
+        seastore_max_concurrent_transactions: 128
+  balancecpunone:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       crimson_balance_cpu: none
-    osd_options:
-      seastore_max_concurrent_transactions: 128
-      seastore_cache_lru_size: 1G
+  base:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+  all:
+    cluster:
+      source_directory: /home/sjust/wip-crimson-perf
+      crimson_balance_cpu: none
+      osd_options:
+        seastore_max_concurrent_transactions: 128
+        seastore_cache_lru_size: 1G
