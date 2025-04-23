@@ -18,14 +18,14 @@ base:
   workload:
     type: fio_rbd
     pool_size: 3
-    rbd_size: 10G
+    rbd_size: 50G
     num_pgs: 512
     num_clients: 4
     fio_args:
       iodepth: 32
       rw: randwrite 
       bs: 4096
-      numjobs: 1
+      numjobs: 4
       runtime: 10
       time_based: 1
   perfmonitors:
