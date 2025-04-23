@@ -131,7 +131,7 @@ class Cluster:
         def cluster_cmd(self, cmd, positional, named):
             self.logger.getChild('cluster_cmd').info(
                 f"({cmd} {positional} {named})")
-            subprocess.check_output(
+            return subprocess.check_output(
                 ([cmd] + \
                  [str(x) for x in positional] +
                  [f"--{k}={v}" for k, v in named.items()]),
@@ -139,10 +139,13 @@ class Cluster:
             )
 
         def ceph_cmd(self, *args, **kwargs):
-            self.cluster_cmd(self.get_ceph_bin(), *args, **kwargs)
+            return self.cluster_cmd(self.get_ceph_bin(), *args, **kwargs)
+
+        def ceph_status(self):
+            return yaml.safe_load(self.ceph_cmd(['status', '--format=json']))
 
         def rbd_cmd(self, *args, **kwargs):
-            self.cluster_cmd(self.get_rbd_bin(), *args, **kwargs)
+            return self.cluster_cmd(self.get_rbd_bin(), *args, **kwargs)
 
         def create_pool(self, name, size, pg_num):
             self.ceph_cmd(
@@ -305,6 +308,27 @@ class VStartCluster(Cluster):
                 self.get_osd_pid(osdid),
                 get_cpumask(self.cpuset_base, self.osd_cores, osdid))
 
+
+    def is_cluster_unhealthy(self):
+        """
+        If unhealthy, returns reason.
+        If healthy, returns None
+        """
+        status = self.handle.ceph_status()
+
+        osds_up = status['osdmap']['num_up_osds']
+        unclean_pgs = list(filter(
+            lambda x: x['state_name'] != 'active+clean',
+            status['pgmap']['pgs_by_state']))
+
+        if osds_up == self.num_osds and len(unclean_osds) == 0:
+            return None
+        else:
+            unclean_pg_str = ', '.join(
+                [f"{x['state_name']}:{x['count']}"])
+            return f"{osds_up}/{self.num_osds} up, unclean_pgs: [{unclean_pgs_str}]"
+        
+
     def start(self):
         time_start = time.time()
         self.output['git_sha1'] = get_git_version(self.source_directory)
@@ -332,6 +356,15 @@ class VStartCluster(Cluster):
                         continue
                     else:
                         raise e
+
+        reason = None
+        while time.time() < (time_start + self.startup_timeout):
+            reason = self.is_cluster_unhealthy()
+            if reason is None:
+                break
+
+        if reason != None:
+            raise Exception(f"VStartCluster.start cluster still unhealthy: {reason}")
         
     def stop(self):
         kill_test_procs()
