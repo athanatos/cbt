@@ -25,8 +25,8 @@ base:
       iodepth: 32
       rw: randwrite 
       bs: 4096
-      numjobs: 4
-      runtime: 300
+      numjobs: 1
+      runtime: 10
       time_based: 1
   perfmonitors:
 #  - type: perf
