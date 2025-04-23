@@ -375,7 +375,7 @@ class FioRBD(Workload):
         type: FioRBD
         bin: fio
         num_pgs: 32
-        numclients: 4
+        num_clients: 4
         fio_args:
             iodepth: 32
             rw: randread
@@ -397,7 +397,7 @@ class FioRBD(Workload):
                 'num_pgs': 32,
                 'pool_size': 1,
                 'rbd_size': '1G',
-                'numclients': 1
+                'num_clients': 1
             },
             conf)
         self.fio_args['ioengine'] = 'rbd'
@@ -429,7 +429,7 @@ class FioRBD(Workload):
 
     def get_summary(self):
         def summarize(f, c):
-            return c(map(f, range(self.numclients)))
+            return c(map(f, range(self.num_clients)))
             
         res = self.output['results']
 
@@ -467,7 +467,7 @@ class FioRBD(Workload):
             logger.debug(f"created image {name} size {self.rbd_size}")
         threads = [
             threading.Thread(target=lambda: make_image(x))
-            for x in range(self.numclients)
+            for x in range(self.num_clients)
         ]
         [t.run() for t in threads]
         [t.join() for t in threads]
@@ -492,7 +492,7 @@ class FioRBD(Workload):
                 cwd = self.cluster_handle.get_conf_directory(),
                 stdout = subprocess.PIPE)
 
-        self.procs = [get_fio_proc(x) for x in range(self.numclients)]
+        self.procs = [get_fio_proc(x) for x in range(self.num_clients)]
 
     def join(self):
         [x.wait() for x in self.procs]
