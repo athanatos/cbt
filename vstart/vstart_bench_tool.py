@@ -143,7 +143,7 @@ class Cluster:
 
         def ceph_status(self):
             return yaml.safe_load(
-                self.ceph_cmd(['status'], {'format': 'json']))
+                self.ceph_cmd(['status'], {'format': 'json'}))
 
         def rbd_cmd(self, *args, **kwargs):
             return self.cluster_cmd(self.get_rbd_bin(), *args, **kwargs)
