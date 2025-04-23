@@ -18,7 +18,7 @@ base:
   workload:
     type: fio_rbd
     pool_size: 3
-    rbd_size: 50G
+    rbd_size: 10G
     num_pgs: 512
     num_clients: 4
     fio_args:

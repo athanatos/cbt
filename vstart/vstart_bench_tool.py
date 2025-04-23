@@ -484,7 +484,7 @@ class FioRBD(Workload):
             return [get_arg(x) for x in fio_args.items()]
 
         def get_fio_proc(clientid):
-            args = [self.bin] + self.get_fio_arg_list(self.get_fio_args(clientid))
+            args = [self.bin] + get_fio_arg_list(self.get_fio_args(clientid))
             env = get_merged_env({})
             self.logger.getChild('start').debug(f"args={args}")
             self.process = subprocess.Popen(
