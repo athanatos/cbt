@@ -314,7 +314,7 @@ class VStartCluster(Cluster):
         If unhealthy, returns reason.
         If healthy, returns None
         """
-        status = self.handle.ceph_status()
+        status = self.get_handle().ceph_status()
 
         osds_up = status['osdmap']['num_up_osds']
         unclean_pgs = list(filter(
