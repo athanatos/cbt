@@ -375,6 +375,7 @@ class FioRBD(Workload):
         type: FioRBD
         bin: fio
         num_pgs: 32
+        numclients: 4
         fio_args:
             iodepth: 32
             rw: randread
@@ -395,7 +396,8 @@ class FioRBD(Workload):
                 'pool_name': 'test_pool',
                 'num_pgs': 32,
                 'pool_size': 1,
-                'rbd_size': '1G'
+                'rbd_size': '1G',
+                'numclients': 1
             },
             conf)
         self.fio_args['ioengine'] = 'rbd'
@@ -404,7 +406,6 @@ class FioRBD(Workload):
         self.fio_args['group_reporting'] = None
         self.fio_args['name'] = 'fio'
         self.fio_args['pool'] = self.pool_name
-        self.fio_args['rbdname'] = self.rbd_name
         self.cluster_handle = cluster_handle
         self.conf['fio_args'] = self.fio_args
         try:
@@ -418,42 +419,87 @@ class FioRBD(Workload):
     def get_output(self):
         return self.output
 
+    def get_rbd_name(self, clientid):
+        return f"{self.rbd_name}-{clientid}"
+
+    def get_fio_args(self, clientid):
+        args = copy.deepcopy(self.fio_args)
+        args['rbdname'] = self.get_rbd_name(clientid)
+        return args
+
     def get_summary(self):
+        def summarize(f, c):
+            return c(map(f, range(self.numclients)))
+            
+        res = self.output['results']
+
         return {
-            'write_iops': self.output['results']['jobs'][0]['write']['iops'],
-            'write_lat_ms': self.output['results']['jobs'][0]['write']['lat_ns']['mean'] / 1000000,
-            'read_iops': self.output['results']['jobs'][0]['read']['iops'],
-            'read_lat_ms': self.output['results']['jobs'][0]['read']['lat_ns']['mean'] / 1000000,
+            'write_iops': summarize(
+                lambda cid: res[cid]['jobs'][0]['write']['iops'],
+                sum),
+            'write_lat_ms': summarize(
+                lambda cid: res[cid]['jobs'][0]['write']['lat_ns']['mean'] / 1000000,
+                statistics.mean),
+            'read_iops': summarize(
+                lambda cid: res[cid]['jobs'][0]['read']['iops'],
+                sum),
+            'read_lat_ms': summarize(
+                lambda cid: res[cid]['jobs'][0]['read']['lat_ns']['mean'] / 1000000,
+                statistics.mean)
         }
 
-    def get_fio_args(self):
-        def get_arg(x):
-            k, v = x
-            if v is None:
-                return f"-{k}"
-            else:
-                return f"-{k}={v}"
-        return [get_arg(x) for x in self.fio_args.items()]
-
     def prepare(self):
-        self.cluster_handle.create_pool(self.pool_name, self.pool_size, self.num_pgs)
-        self.cluster_handle.create_rbd_image(self.pool_name, self.rbd_name, self.rbd_size)
+        logger = self.logger.getChild('prepare')
+        logger.debug(
+            f"creating pool {self.pool_name} size " +
+            f"{self.pool_size} pgs {self.num_pgs}")
+        self.cluster_handle.create_pool(
+            self.pool_name, self.pool_size, self.num_pgs)
+        logger.debug(
+            f"created pool {self.pool_name} size " +
+            f"{self.pool_size} pgs {self.num_pgs}")
+
+        def make_image(clientid):
+            name = self.get_rbd_name(clientid)
+            logger.debug(f"creating image {name} size {self.rbd_size}")
+            self.cluster_handle.create_rbd_image(
+                self.pool_name, name, self.rbd_size)
+            logger.debug(f"created image {name} size {self.rbd_size}")
+        threads = [
+            threading.Thread(target=lambda: make_image(x))
+            for x in range(self.numclients)
+        ]
+        [t.run() for t in threads]
+        [t.join() for t in threads]
+        logger.debug("prepare complete")
 
     def start(self):
-        args = [self.bin] + self.get_fio_args()
-        env = get_merged_env({})
-        self.logger.getChild('start').debug("args={}, env={}".format(args, env))
-        self.process = subprocess.Popen(
-            args, env = env,
-            cwd = self.cluster_handle.get_conf_directory(),
-            stdout = subprocess.PIPE)
+        def get_fio_arg_list(self, fio_args):
+            def get_arg(x):
+                k, v = x
+                if v is None:
+                    return f"-{k}"
+                else:
+                    return f"-{k}={v}"
+            return [get_arg(x) for x in fio_args.items()]
+
+        def get_fio_proc(clientid):
+            args = [self.bin] + self.get_fio_arg_list(self.get_fio_args(clientid))
+            env = get_merged_env({})
+            self.logger.getChild('start').debug(f"args={args}")
+            self.process = subprocess.Popen(
+                args, env = env,
+                cwd = self.cluster_handle.get_conf_directory(),
+                stdout = subprocess.PIPE)
+
+        self.procs = [get_fio_proc(x) for x in range(self.numclients)]
 
     def join(self):
-        self.process.wait(self.timeout)
+        [x.wait() for x in self.procs]
         self.output = {
             'conf': self.conf
         }
-        self.output['results'] = yaml.safe_load(self.process.stdout)
+        self.output['results'] = [yaml.safe_load(x.stdout) for x in self.procs]
 
 
 class Repeat(Workload):
