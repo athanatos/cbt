@@ -78,6 +78,13 @@ def set_process_cpu_mask(pid, cpumask):
     subprocess.check_output(
         ['taskset', '-a', '-c', '-p', cpumask, pid])
 
+def kill_test_procs():
+    subprocess.run([ 'pkill', '-9', 'crimson-osd'])
+    subprocess.run([ 'pkill', '-9', 'ceph-osd'])
+    subprocess.run([ 'pkill', '-9', 'ceph-mon'])
+    subprocess.run([ 'pkill', '-9', 'fio'])
+    subprocess.run([ 'pkill', '-9', 'rbd'])
+
 def set_attr_from_config(self, defaults, conf):
     self.conf = {}
     for k in conf:
@@ -327,10 +334,9 @@ class VStartCluster(Cluster):
                         raise e
         
     def stop(self):
-        subprocess.run([ 'pkill', '-9', 'crimson-osd'])
-        subprocess.run([ 'pkill', '-9', 'ceph-osd'])
+        kill_test_procs()
         stop_process = subprocess.run(
-            [ '../src/stop.sh'],
+            [ '../src/stop.sh', '--crimson'],
             cwd = self.build_directory,
             shell = True,
             timeout = self.command_timeout)
@@ -669,6 +675,7 @@ class Counters(PerfMonitor):
         pass
 
 def main():
+    kill_test_procs()
     parser = argparse.ArgumentParser(
         prog='vstart_bench_tool',
         description='Benchmarks RADOS via vstart')
