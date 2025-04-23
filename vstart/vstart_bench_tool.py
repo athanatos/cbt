@@ -466,7 +466,7 @@ class FioRBD(Workload):
                 self.pool_name, name, self.rbd_size)
             logger.debug(f"created image {name} size {self.rbd_size}")
         threads = [
-            threading.Thread(target=lambda: make_image(x))
+            threading.Thread(target=(lambda y: lambda: make_image(y)))(x)
             for x in range(self.num_clients)
         ]
         [t.start() for t in threads]
