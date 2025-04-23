@@ -138,19 +138,20 @@ class Cluster:
                 cwd = self.get_conf_directory()
             )
 
-        def ceph_cmd(self, *args, **kwargs):
-            return self.cluster_cmd(self.get_ceph_bin(), *args, **kwargs)
+        def ceph_cmd(self, positional, named):
+            return self.cluster_cmd(self.get_ceph_bin(), positional, named)
 
         def ceph_status(self):
-            return yaml.safe_load(self.ceph_cmd(['status', '--format=json']))
+            return yaml.safe_load(
+                self.ceph_cmd(['status'], {'format': 'json']))
 
         def rbd_cmd(self, *args, **kwargs):
             return self.cluster_cmd(self.get_rbd_bin(), *args, **kwargs)
 
         def create_pool(self, name, size, pg_num):
             self.ceph_cmd(
-                ['osd', 'pool', 'create', name, pg_num, pg_num, '--size', size]
-                , {})
+                ['osd', 'pool', 'create', name, pg_num, pg_num],
+                {'size': size})
                             
         def create_rbd_image(self, pool, name, size):
             self.rbd_cmd(
