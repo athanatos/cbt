@@ -326,7 +326,7 @@ class VStartCluster(Cluster):
             return None
         else:
             unclean_pg_str = ', '.join(
-                [f"{x['state_name']}:{x['count']}"])
+                [f"{x['state_name']}:{x['count']}" for x in unclean_pgs])
             return f"{osds_up}/{self.num_osds} up, unclean_pgs: [{unclean_pgs_str}]"
         
 
