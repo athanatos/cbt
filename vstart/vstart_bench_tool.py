@@ -322,7 +322,7 @@ class VStartCluster(Cluster):
             lambda x: x['state_name'] != 'active+clean',
             status['pgmap']['pgs_by_state']))
 
-        if osds_up == self.num_osds and len(unclean_osds) == 0:
+        if osds_up == self.num_osds and len(unclean_pgs) == 0:
             return None
         else:
             unclean_pgs_str = ', '.join(
