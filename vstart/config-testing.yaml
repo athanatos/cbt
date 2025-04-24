@@ -1,6 +1,10 @@
 # test repop reply branch
 base:
   cluster:
+    crimson: true
+    seastore: true
+    crimson_balance_cpu: none
+    osd_cores: 32
     source_directory: /home/sjust/wip-crimson-perf
     type: vstart
     osd_devices:
@@ -13,6 +17,9 @@ base:
     - /dev/nvme2n1
     - /dev/nvme3n1
     num_osds: 1
+    osd_options:
+      seastore_max_concurrent_transactions: 128
+      seastore_cache_lru_size: 1G
   workload:
     type: fio_rbd
     pool_size: 1
@@ -30,13 +37,4 @@ base:
   - type: perf
   - type: counters
 overrides:
-  classic:
   crimson:
-    cluster:
-      crimson: true
-      seastore: true
-      osd_cores: 32
-      crimson_balance_cpu: none
-      osd_options:
-        seastore_max_concurrent_transactions: 128
-        seastore_cache_lru_size: 1G
