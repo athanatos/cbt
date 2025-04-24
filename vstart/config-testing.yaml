@@ -12,7 +12,7 @@ base:
     - /dev/nvme1n1
     - /dev/nvme2n1
     - /dev/nvme3n1
-    num_osds: 3
+    num_osds: 1
   workload:
     type: fio_rbd
     pool_size: 1
@@ -31,11 +31,11 @@ base:
 #  - type: counters
 overrides:
   classic:
-  all:
+  crimson:
     cluster:
       crimson: true
       seastore: true
-      osd_cores: 12
+      osd_cores: 36
       crimson_balance_cpu: none
       osd_options:
         seastore_max_concurrent_transactions: 128
