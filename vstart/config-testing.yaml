@@ -39,4 +39,5 @@ base:
 overrides:
   perf:
   baseline:
-    source_directory: /home/sjust/baseline
+    cluster:
+      source_directory: /home/sjust/baseline
