@@ -325,7 +325,7 @@ class VStartCluster(Cluster):
         if osds_up == self.num_osds and len(unclean_osds) == 0:
             return None
         else:
-            unclean_pg_str = ', '.join(
+            unclean_pgs_str = ', '.join(
                 [f"{x['state_name']}:{x['count']}" for x in unclean_pgs])
             return f"{osds_up}/{self.num_osds} up, unclean_pgs: [{unclean_pgs_str}]"
         
