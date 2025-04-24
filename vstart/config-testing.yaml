@@ -3,7 +3,6 @@ base:
   cluster:
     crimson: true
     seastore: true
-    crimson_balance_cpu: none
     osd_cores: 32
     source_directory: /home/sjust/wip-crimson-perf
     type: vstart
