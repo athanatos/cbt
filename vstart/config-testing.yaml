@@ -35,7 +35,7 @@ overrides:
     cluster:
       crimson: true
       seastore: true
-      osd_cores: 36
+      osd_cores: 32
       crimson_balance_cpu: none
       osd_options:
         seastore_max_concurrent_transactions: 128
