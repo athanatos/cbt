@@ -547,7 +547,7 @@ class Repeat(Workload):
     Example config:
 
     workload:
-        type: Repeat
+        type: repeat
         runs: 3
         workload:
           bin: fio

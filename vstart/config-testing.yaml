@@ -16,28 +16,33 @@ base:
     - /dev/nvme1n1
     - /dev/nvme2n1
     - /dev/nvme3n1
-    num_osds: 1
+    num_osds: 3
     osd_options:
       seastore_max_concurrent_transactions: 128
       seastore_cache_lru_size: 1G
   workload:
-    type: fio_rbd
-    pool_size: 1
-    rbd_size: 10G
-    num_pgs: 512
-    num_clients: 32
-    fio_args:
-      iodepth: 32
-      rw: randwrite 
-      bs: 4096
-      numjobs: 4
-      runtime: 300
-      time_based: 1
-  perfmonitors:
-  - type: perf
-  - type: counters
+    type: repeat
+      runs: 5
+      workload:
+        type: fio_rbd
+        pool_size: 3
+        rbd_size: 10G
+        num_pgs: 512
+        num_clients: 32
+        fio_args:
+          iodepth: 32
+          rw: randwrite 
+          bs: 4096
+          numjobs: 4
+          runtime: 300
+          time_based: 1
+#  perfmonitors:
+#  - type: perf
+#  - type: counters
 overrides:
-  perf:
   baseline:
     cluster:
-      source_directory: /home/sjust/baseline
+      source_directory: /home/sjust/wip-crimson-perf
+  repop:
+    cluster:
+      source_directory: /home/sjust/testing-repop-reply-ordering
