@@ -22,20 +22,20 @@ base:
       seastore_cache_lru_size: 1G
   workload:
     type: repeat
-      runs: 5
-      workload:
-        type: fio_rbd
-        pool_size: 3
-        rbd_size: 10G
-        num_pgs: 512
-        num_clients: 32
-        fio_args:
-          iodepth: 32
-          rw: randwrite 
-          bs: 4096
-          numjobs: 4
-          runtime: 300
-          time_based: 1
+    runs: 5
+    workload:
+      type: fio_rbd
+      pool_size: 3
+      rbd_size: 10G
+      num_pgs: 512
+      num_clients: 32
+      fio_args:
+        iodepth: 32
+        rw: randwrite 
+        bs: 4096
+        numjobs: 4
+        runtime: 300
+        time_based: 1
 #  perfmonitors:
 #  - type: perf
 #  - type: counters
