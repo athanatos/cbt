@@ -39,10 +39,13 @@ base:
 #  - type: counters
 overrides:
   none:
+    workload:
+      taskset: '1-79:2'
     cluster:
       osd_cores: 32
       crimson_balance_cpu: none
-  none:
+      taskset: '2-78:2'
+  none-taskset:
     workload:
       taskset: '1-79:2'
     cluster:
