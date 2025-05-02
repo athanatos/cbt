@@ -1,6 +1,7 @@
 # test repop reply branch
 base:
   cluster:
+    source_directory: /home/sjust/wip-crimson-perf
     crimson: true
     seastore: true
     crimson_balance_cpu: none
@@ -40,9 +41,9 @@ base:
 #  - type: perf
 #  - type: counters
 overrides:
-  baseline:
+  none:
     cluster:
-      source_directory: /home/sjust/wip-crimson-perf
-  repop:
+      crimson_balance_cpu: none
+  osd:
     cluster:
-      source_directory: /home/sjust/testing-repop-reply-ordering
+      crimson_balance_cpu: osd
