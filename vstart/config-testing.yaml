@@ -47,3 +47,6 @@ overrides:
   osd:
     cluster:
       crimson_balance_cpu: osd
+  socket:
+    cluster:
+      crimson_balance_cpu: socket
