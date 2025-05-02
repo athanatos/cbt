@@ -321,7 +321,7 @@ class VStartCluster(Cluster):
         self.stop()
         cmdline = []
         if self.taskset:
-            cmdline += ['taskset', '-acp', self.taskset]
+            cmdline += ['taskset', '-ac', self.taskset]
         cmdline += [ '../src/vstart.sh'] + self.get_args()
         self.logger.getChild('start').info(
             " ".join(cmdline))
@@ -514,7 +514,7 @@ class FioRBD(Workload):
         def get_fio_proc(clientid):
             args = []
             if self.taskset:
-                args += ['taskset', '-acp', self.taskset]
+                args += ['taskset', '-ac', self.taskset]
             args += [self.bin] + get_fio_arg_list(self.get_fio_args(clientid))
             env = get_merged_env({})
             self.logger.getChild('start').debug(f"args={args}")
