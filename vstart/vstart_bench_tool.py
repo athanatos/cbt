@@ -201,7 +201,8 @@ class VStartCluster(Cluster):
                 'num_osds': 1,
                 'osd_options': {},
                 'startup_timeout': 60,
-                'crimson_balance_cpu': ''
+                'crimson_balance_cpu': '',
+                'crimson_reactor_physical_only': False
             },
             conf)
         self.build_directory = os.path.join(self.source_directory, 'build')
@@ -236,6 +237,8 @@ class VStartCluster(Cluster):
                     ret += ['--seastore-devs', ','.join(self.osd_devices)]
             if self.crimson_balance_cpu != '':
                 ret += ['--crimson-balance-cpu', self.crimson_balance_cpu]
+            if self.crimson_reactor_physical_only:
+                ret += ['--crimson-reactor-physical-only']
         else:
             if self.osd_devices != []:
                 ret += ['--bluestore-devs', ','.join(self.osd_devices)]

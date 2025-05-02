@@ -17,7 +17,7 @@ base:
     - /dev/nvme1n1
     - /dev/nvme2n1
     - /dev/nvme3n1
-    num_osds: 3
+    num_osds: 1
     osd_options:
       seastore_max_concurrent_transactions: 128
       seastore_cache_lru_size: 1G
@@ -26,7 +26,7 @@ base:
     runs: 5
     workload:
       type: fio_rbd
-      pool_size: 3
+      pool_size: 1
       rbd_size: 10G
       num_pgs: 512
       num_clients: 32
@@ -41,12 +41,17 @@ base:
 #  - type: perf
 #  - type: counters
 overrides:
-  osd:
-    cluster:
-      crimson_balance_cpu: osd
-  socket:
-    cluster:
-      crimson_balance_cpu: socket
   none:
     cluster:
+      osd_cores: 32
       crimson_balance_cpu: none
+  osd-logical:
+    cluster:
+      osd_cores: 32
+      crimson_balance_cpu: osd
+      crimson_reactor_physical_only: False
+  osd-physical:
+    cluster:
+      osd_cores: 16
+      crimson_balance_cpu: osd
+      crimson_reactor_physical_only: True
