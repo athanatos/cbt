@@ -5,7 +5,7 @@ base:
     crimson: true
     seastore: true
     crimson_balance_cpu: none
-    osd_cores: 32
+    osd_cores: 16
     source_directory: /home/sjust/wip-crimson-perf
     type: vstart
     osd_devices:
@@ -35,18 +35,18 @@ base:
         rw: randwrite 
         bs: 4096
         numjobs: 4
-        runtime: 300
+        runtime: 60
         time_based: 1
 #  perfmonitors:
 #  - type: perf
 #  - type: counters
 overrides:
-  none:
-    cluster:
-      crimson_balance_cpu: none
   osd:
     cluster:
       crimson_balance_cpu: osd
   socket:
     cluster:
       crimson_balance_cpu: socket
+  none:
+    cluster:
+      crimson_balance_cpu: none
