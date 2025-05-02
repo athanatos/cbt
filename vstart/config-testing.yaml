@@ -22,21 +22,18 @@ base:
       seastore_max_concurrent_transactions: 128
       seastore_cache_lru_size: 1G
   workload:
-    type: repeat
-    runs: 5
-    workload:
-      type: fio_rbd
-      pool_size: 1
-      rbd_size: 10G
-      num_pgs: 512
-      num_clients: 32
-      fio_args:
-        iodepth: 32
-        rw: randwrite 
-        bs: 4096
-        numjobs: 4
-        runtime: 60
-        time_based: 1
+    type: fio_rbd
+    pool_size: 1
+    rbd_size: 10G
+    num_pgs: 512
+    num_clients: 32
+    fio_args:
+      iodepth: 32
+      rw: randwrite 
+      bs: 4096
+      numjobs: 4
+      runtime: 60
+      time_based: 1
 #  perfmonitors:
 #  - type: perf
 #  - type: counters
@@ -45,13 +42,17 @@ overrides:
     cluster:
       osd_cores: 32
       crimson_balance_cpu: none
-  osd-logical:
+  none:
+    workload:
+      taskset: '30-39,70-79'
     cluster:
       osd_cores: 32
-      crimson_balance_cpu: osd
-      crimson_reactor_physical_only: False
-  osd-physical:
+      crimson_balance_cpu: none
+      taskset: '0-29,40-69'
+  osd-logical:
+    workload:
+      taskset: '30-39,70-79'
     cluster:
-      osd_cores: 16
+      osd_cores: 32
+      taskset: '0-29,40-69'
       crimson_balance_cpu: osd
-      crimson_reactor_physical_only: True

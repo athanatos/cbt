@@ -193,9 +193,8 @@ class VStartCluster(Cluster):
                 'source_directory': None,
                 'command_timeout': 120,
                 'crimson': False,
-                'cpuset_base': 0,
+                'taskset': None,
                 'osd_cores': 8,
-                'cpuset': '',
                 'seastore': False,
                 'osd_devices': [],
                 'num_osds': 1,
@@ -210,13 +209,6 @@ class VStartCluster(Cluster):
         self.output = {
             'conf': self.conf
         }
-        if self.cpuset == '':
-            self.cpuset = "{}-{}".format(
-                self.cpuset_base,
-                self.cpuset_base + (self.osd_cores * self.num_osds)
-            )
-        self.logger.getChild('__init__').info(
-            f"self.cpuset_base={self.cpuset_base}, self.cpuset={self.cpuset}")
 
     def get_output(self):
         return self.output
@@ -303,16 +295,6 @@ class VStartCluster(Cluster):
             return f.read().strip()
 
 
-    def set_osd_cpumask(self):
-        def get_cpumask(base, cores, osdid):
-            return f"{base + (osdid * cores)}-{base + ((osdid + 1) * cores)}"
-
-        for osdid in range(self.num_osds):
-            set_process_cpu_mask(
-                self.get_osd_pid(osdid),
-                get_cpumask(self.cpuset_base, self.osd_cores, osdid))
-
-
     def is_cluster_unhealthy(self):
         """
         If unhealthy, returns reason.
@@ -337,7 +319,10 @@ class VStartCluster(Cluster):
         time_start = time.time()
         self.output['git_sha1'] = get_git_version(self.source_directory)
         self.stop()
-        cmdline = [ '../src/vstart.sh'] + self.get_args()
+        cmdline = []
+        if self.taskset:
+            cmdline += ['taskset', '-acp', self.taskset]
+        cmdline += [ '../src/vstart.sh'] + self.get_args()
         self.logger.getChild('start').info(
             " ".join(cmdline))
         startup_process = subprocess.run(
@@ -433,7 +418,7 @@ class FioRBD(Workload):
             {
                 'bin': 'fio',
                 'fio_args': {},
-                'cpuset': '',
+                'taskset': None,
                 'timeout_ratio': 2,
                 'rbd_name': 'test_rbd',
                 'pool_name': 'test_pool',
@@ -527,7 +512,10 @@ class FioRBD(Workload):
             return [get_arg(x) for x in fio_args.items()]
 
         def get_fio_proc(clientid):
-            args = [self.bin] + get_fio_arg_list(self.get_fio_args(clientid))
+            args = []
+            if self.taskset:
+                args += ['taskset', '-acp', self.taskset]
+            args += [self.bin] + get_fio_arg_list(self.get_fio_args(clientid))
             env = get_merged_env({})
             self.logger.getChild('start').debug(f"args={args}")
             return subprocess.Popen(
