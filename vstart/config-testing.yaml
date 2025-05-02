@@ -40,27 +40,27 @@ base:
 overrides:
   none:
     cluster:
-      osd_cores: 20
+      osd_cores: 32
       crimson_balance_cpu: none
   none:
     workload:
       taskset: '1-79:2'
     cluster:
-      osd_cores: 40
+      osd_cores: 32
       crimson_balance_cpu: none
       taskset: '2-78:2'
   osd-logical:
     workload:
       taskset: '1-79:2'
     cluster:
-      osd_cores: 40
+      osd_cores: 32
       taskset: '2-78:2'
       crimson_balance_cpu: osd
   osd-physical:
     workload:
       taskset: '1-79:2'
     cluster:
-      osd_cores: 20
+      osd_cores: 16
       taskset: '2-78:2'
       crimson_balance_cpu: osd
       crimson_reactor_physical_only: True
