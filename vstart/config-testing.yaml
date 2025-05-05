@@ -38,32 +38,11 @@ base:
 #  - type: perf
 #  - type: counters
 overrides:
-  none:
-    workload:
-      taskset: '1-79:2'
+  baseline:
     cluster:
-      osd_cores: 32
-      crimson_balance_cpu: none
-      taskset: '2-78:2'
-  none-taskset:
-    workload:
-      taskset: '1-79:2'
+      osd_options:
+        crimson_disable_log_writes_breaks_ceph: False
+  no-pg-log:
     cluster:
-      osd_cores: 32
-      crimson_balance_cpu: none
-      taskset: '2-78:2'
-  osd-logical:
-    workload:
-      taskset: '1-79:2'
-    cluster:
-      osd_cores: 32
-      taskset: '2-78:2'
-      crimson_balance_cpu: osd
-  osd-physical:
-    workload:
-      taskset: '1-79:2'
-    cluster:
-      osd_cores: 16
-      taskset: '2-78:2'
-      crimson_balance_cpu: osd
-      crimson_reactor_physical_only: True
+      osd_options:
+        crimson_disable_log_writes_breaks_ceph: True
