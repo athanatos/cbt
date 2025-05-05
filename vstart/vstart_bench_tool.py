@@ -233,8 +233,14 @@ class VStartCluster(Cluster):
                 ret += ['--crimson-reactor-physical-only']
         else:
             if self.osd_devices != []:
+                def tostr(x):
+                    if type(x) == bool:
+                        return str(x).lower()
+                    else:
+                        return str(x)
                 ret += ['--bluestore-devs', ','.join(self.osd_devices)]
-        osd_options = ' '.join([f'--{k}={v}' for k, v in self.osd_options.items()])
+        osd_options = ' '.join([f'--{k}={tostr(v)}' for k, v
+                                in self.osd_options.items()])
         if osd_options != '':
             ret += ['--osd-args', osd_options]
         return ret
