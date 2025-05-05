@@ -193,7 +193,7 @@ class VStartCluster(Cluster):
                 'source_directory': None,
                 'command_timeout': 120,
                 'crimson': False,
-                'taskset': None,
+                'taskset': '',
                 'osd_cores': 8,
                 'seastore': False,
                 'osd_devices': [],
@@ -418,7 +418,7 @@ class FioRBD(Workload):
             {
                 'bin': 'fio',
                 'fio_args': {},
-                'taskset': None,
+                'taskset': '',
                 'timeout_ratio': 2,
                 'rbd_name': 'test_rbd',
                 'pool_name': 'test_pool',
