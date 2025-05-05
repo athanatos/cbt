@@ -34,7 +34,7 @@ base:
       rw: randwrite 
       bs: 4096
       numjobs: 4
-      runtime: 60
+      runtime: 120
       time_based: 1
 #  perfmonitors:
 #  - type: perf
@@ -44,10 +44,6 @@ overrides:
     cluster:
       osd_options:
         crimson_disable_log_writes_breaks_ceph: false
-  classic:
-    cluster:
-      crimson: false
-      seastore: false
   no-pg-log:
     cluster:
       osd_options:
