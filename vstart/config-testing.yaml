@@ -41,8 +41,8 @@ overrides:
   baseline:
     cluster:
       osd_options:
-        crimson_disable_log_writes_breaks_ceph: False
+        crimson_disable_log_writes_breaks_ceph: false
   no-pg-log:
     cluster:
       osd_options:
-        crimson_disable_log_writes_breaks_ceph: True
+        crimson_disable_log_writes_breaks_ceph: true
