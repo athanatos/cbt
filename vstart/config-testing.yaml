@@ -36,9 +36,9 @@ base:
       numjobs: 4
       runtime: 120
       time_based: 1
-#  perfmonitors:
-#  - type: perf
-#  - type: counters
+  perfmonitors:
+  - type: perf
+  - type: counters
 overrides:
   baseline:
     cluster:
