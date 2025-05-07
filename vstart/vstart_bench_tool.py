@@ -201,7 +201,8 @@ class VStartCluster(Cluster):
                 'osd_options': {},
                 'startup_timeout': 60,
                 'crimson_balance_cpu': '',
-                'crimson_reactor_physical_only': False
+                'crimson_reactor_physical_only': False,
+                'debug': False
             },
             conf)
         self.build_directory = os.path.join(self.source_directory, 'build')
@@ -220,6 +221,8 @@ class VStartCluster(Cluster):
             '--redirect-output',
             '-n', '--no-restart'
         ]
+        if self.debug:
+            ret += ['--debug']
         if self.crimson:
             ret += ['--crimson']
             ret += ["--crimson-smp", "{}".format(self.osd_cores)]
