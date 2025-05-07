@@ -44,6 +44,6 @@ overrides:
     cluster:
       debug: true
       osd_options:
-        seastore_data_delta_based_overwrite: 8192
+        #seastore_data_delta_based_overwrite: 8192
         seastore_main_device_type: RANDOM_BLOCK_SSD
 #  baseline:
