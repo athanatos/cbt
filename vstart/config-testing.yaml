@@ -41,10 +41,8 @@ base:
   - type: counters
 overrides:
   baseline:
+  rbm:
     cluster:
       osd_options:
-        crimson_disable_log_writes_breaks_ceph: false
-  no-pg-log:
-    cluster:
-      osd_options:
-        crimson_disable_log_writes_breaks_ceph: true
+        seastore_data_delta_based_overwrite: 8192
+        seastore_main_device_type: RANDOM_BLOCK_SSD
