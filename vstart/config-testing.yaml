@@ -20,8 +20,8 @@ base:
     - /dev/nvme3n1
     num_osds: 1
     osd_options:
-      seastore_max_concurrent_transactions: 32
-      seastore_cache_lru_size: 128M
+      seastore_max_concurrent_transactions: 128
+      seastore_cache_lru_size: 2G
   workload:
     taskset: '1-32:2'
     type: fio_rbd
