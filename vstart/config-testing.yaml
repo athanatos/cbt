@@ -46,4 +46,5 @@ overrides:
       osd_options:
         seastore_data_delta_based_overwrite: 8192
         seastore_main_device_type: RANDOM_BLOCK_SSD
+        seastore_obj_data_write_amplification: 1000000
 #  baseline:
