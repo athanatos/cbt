@@ -153,7 +153,7 @@ class Cluster:
                 ['osd', 'pool', 'create', name, pg_num, pg_num],
                 {'size': size})
                             
-        def create_rbd_image(self, pool, name, size):
+        def create_rbd_image(self, pool, name, size, prefill_size):
             self.rbd_cmd(
                 ['create', name],
                 {
@@ -169,7 +169,7 @@ class Cluster:
                 f'{pool}/{name}',
             ], {
                 'io-type': 'write',
-                'io-size': '64K',
+                'io-size': prefill_size,
                 'io-threads': '8',
                 'io-pattern': 'seq',
                 'io-total': size
@@ -434,6 +434,7 @@ class FioRBD(Workload):
                 'num_pgs': 32,
                 'pool_size': 1,
                 'rbd_size': '1G',
+                'rbd_prefill_size': '64K',
                 'num_clients': 1
             },
             conf)
@@ -500,7 +501,7 @@ class FioRBD(Workload):
             name = self.get_rbd_name(clientid)
             logger.debug(f"creating image {name} size {self.rbd_size}")
             self.cluster_handle.create_rbd_image(
-                self.pool_name, name, self.rbd_size)
+                self.pool_name, name, self.rbd_size, self.rbd_prefill_size)
             logger.debug(f"created image {name} size {self.rbd_size}")
         threads = [
             threading.Thread(target=(lambda y: lambda: make_image(y))(x))

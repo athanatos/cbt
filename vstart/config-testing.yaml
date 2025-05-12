@@ -27,6 +27,7 @@ base:
     type: fio_rbd
     pool_size: 1
     rbd_size: 10G
+    rbd_prefill_size: 4K
     num_pgs: 512
     num_clients: 32
     fio_args:
