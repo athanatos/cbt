@@ -1,4 +1,4 @@
-# test repop reply branch
+# test converting all assert to ceph_assert
 base:
   cluster:
     taskset: '0-31:2'
@@ -32,10 +32,10 @@ base:
     num_clients: 32
     fio_args:
       iodepth: 32
-      rw: randwrite 
+      rw: randread
       bs: 4096
       numjobs: 4
-      runtime: 120
+      runtime: 600
       time_based: 1
 #  perfmonitors:
 #  - type: perf
@@ -49,6 +49,8 @@ overrides:
 #        seastore_main_device_type: RANDOM_BLOCK_SSD
 #        seastore_obj_data_write_amplification: 1000000
   baseline:
-  coroutine:
     cluster:
-      source_directory: /home/sjust/baseline
+      source_directory: /home/sjust/ceph-assert-63384-baseline
+  ceph_assert:
+    cluster:
+      source_directory: /home/sjust/ceph-assert-63384
