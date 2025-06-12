@@ -122,6 +122,15 @@ class Cluster:
 
         def get_bin_directory(self): pass
 
+        def get_ceph_conf(self):
+            return os.path.join(self.get_bin_directory(), 'ceph.conf')
+
+        def get_ceph_keyring(self):
+            return os.path.join(self.get_bin_directory(), 'keyring')
+
+        def get_standard_args(self):
+            return ['-c', self.get_ceph_conf(), '-k', self.get_ceph_keyring()]
+
         def get_ceph_bin(self):
             return os.path.join(self.get_bin_directory(), 'ceph')
 
@@ -131,6 +140,7 @@ class Cluster:
         def cluster_cmd(self, cmd, positional, named):
             self.logger.getChild('cluster_cmd').info(
                 f"({cmd} {positional} {named})")
+            positional = self.get_standard_args() + positional
             return subprocess.check_output(
                 ([cmd] + \
                  [str(x) for x in positional] +
