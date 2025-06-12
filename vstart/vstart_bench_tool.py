@@ -260,6 +260,7 @@ class VStartCluster(Cluster):
 
     def get_env(self):
         return {
+            'CEPH_CONF': os.path.join(self.build_directory, 'ceph.conf'),
             'MDS': '0',
             'MGR': '1',
             'OSD': str(self.num_osds),
