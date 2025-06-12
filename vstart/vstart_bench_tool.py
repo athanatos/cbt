@@ -123,10 +123,10 @@ class Cluster:
         def get_bin_directory(self): pass
 
         def get_ceph_conf(self):
-            return os.path.join(self.get_bin_directory(), 'ceph.conf')
+            return os.path.join(self.get_conf_directory(), 'ceph.conf')
 
         def get_ceph_keyring(self):
-            return os.path.join(self.get_bin_directory(), 'keyring')
+            return os.path.join(self.get_conf_directory(), 'keyring')
 
         def get_standard_args(self):
             return ['-c', self.get_ceph_conf(), '-k', self.get_ceph_keyring()]
