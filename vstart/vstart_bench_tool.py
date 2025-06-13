@@ -456,6 +456,7 @@ class FioRBD(Workload):
         self.fio_args['group_reporting'] = None
         self.fio_args['name'] = 'fio'
         self.fio_args['pool'] = self.pool_name
+        self.fio_args['conf'] = self.cluster_handle.get_ceph_conf()
         self.cluster_handle = cluster_handle
         self.conf['fio_args'] = self.fio_args
         try:
