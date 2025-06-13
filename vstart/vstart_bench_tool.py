@@ -538,7 +538,10 @@ class FioRBD(Workload):
             if self.taskset:
                 args += ['taskset', '-ac', self.taskset]
             args += [self.bin] + get_fio_arg_list(self.get_fio_args(clientid))
-            env = get_merged_env({})
+            env = get_merged_env({
+                'CEPH_CONF': self.cluster_handle.get_ceph_conf(),
+                'CEPH_KEYRING': self.cluster_handle.get_ceph_keyring(),
+            })
             self.logger.getChild('start').debug(f"args={args}")
             return subprocess.Popen(
                 args, env = env,
