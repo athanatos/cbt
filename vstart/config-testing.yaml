@@ -22,8 +22,6 @@ base:
     osd_options:
       seastore_max_concurrent_transactions: 128
       seastore_cache_lru_size: 2G
-      seastore_main_device_type: RANDOM_BLOCK_SSD
-      seastore_obj_data_write_amplification: 1000000
   workload:
     taskset: '1-32:2'
     type: fio_rbd
@@ -47,4 +45,6 @@ overrides:
     cluster:
       osd_options:
         seastore_data_delta_based_overwrite: 8192
+        seastore_main_device_type: RANDOM_BLOCK_SSD
+        seastore_obj_data_write_amplification: 1000000
   baseline:
