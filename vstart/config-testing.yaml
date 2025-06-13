@@ -34,7 +34,7 @@ base:
     num_clients: 32
     fio_args:
       iodepth: 32
-      rw: randread
+      rw: randwrite
       bs: 4096
       numjobs: 4
       runtime: 600

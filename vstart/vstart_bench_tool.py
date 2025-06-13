@@ -173,6 +173,9 @@ class Cluster:
                     'pool': pool
                 })
 
+            if prefill_size == 0:
+                return
+
             # prepopulate
             self.rbd_cmd([
                 'bench',
