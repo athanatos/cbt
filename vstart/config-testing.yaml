@@ -45,6 +45,11 @@ overrides:
     cluster:
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
+  rbm-high-amplification:
+    cluster:
+      osd_options:
+        seastore_main_device_type: RANDOM_BLOCK_SSD
+        seastore_obj_data_write_amplification: 1000000
   rbm-delta:
     cluster:
       osd_options:
