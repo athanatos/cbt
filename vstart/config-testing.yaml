@@ -2,12 +2,10 @@
 base:
   cluster:
     taskset: '0-31:2'
-    source_directory: /home/sjust/wip-crimson-perf
     crimson: true
     seastore: true
     crimson_balance_cpu: none
     osd_cores: 16
-    source_directory: /home/sjust/wip-crimson-perf
     type: vstart
     osd_devices:
     - /dev/nvme4n1
@@ -41,19 +39,25 @@ base:
 #  - type: perf
 #  - type: counters
 overrides:
-  rbm:
+  rbm-06-20:
     cluster:
+      source_directory: /home/sjust/baseline
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
-  rbm-high-amplification:
+  rbm-05-01:
     cluster:
+      source_directory: /home/sjust/baseline-05-01
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
-        seastore_obj_data_write_amplification: 1000000
-  rbm-delta:
-    cluster:
-      osd_options:
-        seastore_data_delta_based_overwrite: 8192
-        seastore_main_device_type: RANDOM_BLOCK_SSD
-        seastore_obj_data_write_amplification: 1000000
-  baseline:
+#  rbm-high-amplification:
+#    cluster:
+#      osd_options:
+#        seastore_main_device_type: RANDOM_BLOCK_SSD
+#        seastore_obj_data_write_amplification: 1000000
+#  rbm-delta:
+#    cluster:
+#      osd_options:
+#        seastore_data_delta_based_overwrite: 8192
+#        seastore_main_device_type: RANDOM_BLOCK_SSD
+#        seastore_obj_data_write_amplification: 1000000
+#  baseline:
