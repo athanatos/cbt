@@ -39,13 +39,19 @@ base:
 #  - type: perf
 #  - type: counters
 overrides:
-  rbm-05-01:
+  rbm-2025-05-01:
     cluster:
       source_directory: /home/sjust/baseline-2025-05-01
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
   rbm-2025-06-20:
     cluster:
+      source_directory: /home/sjust/baseline
+      osd_options:
+        seastore_main_device_type: RANDOM_BLOCK_SSD
+  rbm-2025-06-20:
+    cluster:
+      seastore: false
       source_directory: /home/sjust/baseline
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
