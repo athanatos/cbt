@@ -12,7 +12,6 @@ base:
     - /dev/nvme5n1
     - /dev/nvme6n1
     - /dev/nvme7n1
-    - /dev/nvme0n1
     - /dev/nvme1n1
     - /dev/nvme2n1
     - /dev/nvme3n1
@@ -45,11 +44,11 @@ overrides:
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
         seastore_obj_data_write_amplification: 1000000
-        seastore_data_delta_based_overwrite: 8192
+        seastore_data_delta_based_overwrite: 1000000
   rbm-seastore-overwrites:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
         seastore_obj_data_write_amplification: 1000000
-        seastore_data_delta_based_overwrite: 8192
+        seastore_data_delta_based_overwrite: 1000000
