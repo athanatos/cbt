@@ -35,7 +35,7 @@ base:
       runtime: 100
       time_based: 1
   perfmonitors:
-#  - type: perf
+  - type: perf
   - type: counters
 overrides:
   rbm-seastore-overwrites:
@@ -45,10 +45,10 @@ overrides:
         seastore_main_device_type: RANDOM_BLOCK_SSD
         seastore_obj_data_write_amplification: 1000000
         seastore_data_delta_based_overwrite: 1000000
-  rbm-2025-06-20:
-    cluster:
-      source_directory: /home/sjust/baseline
-      osd_options:
-        seastore_main_device_type: RANDOM_BLOCK_SSD
-        seastore_obj_data_write_amplification: 1000000
-        seastore_data_delta_based_overwrite: 1000000
+#  rbm-2025-06-20:
+#    cluster:
+#      source_directory: /home/sjust/baseline
+#      osd_options:
+#        seastore_main_device_type: RANDOM_BLOCK_SSD
+#        seastore_obj_data_write_amplification: 1000000
+#        seastore_data_delta_based_overwrite: 1000000
