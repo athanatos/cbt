@@ -293,6 +293,7 @@ class VStartCluster(Cluster):
             self.logger.getChild('run_osd_asok').info(f"osd.{osd} args {' '.join(args)}")
             return subprocess.Popen(
                 args,
+                env = get_merged_env(self.parent.get_env()),
                 cwd = self.get_conf_directory(),
                 stdout = subprocess.PIPE)
 
