@@ -23,7 +23,7 @@ base:
     taskset: '1-32:2'
     type: fio_rbd
     pool_size: 1
-    rbd_size: 10G
+    rbd_size: 1G
     rbd_prefill_size: 4K
     num_pgs: 512
     num_clients: 32
