@@ -38,22 +38,12 @@ base:
   - type: perf
   - type: counters
 overrides:
-  rbm-seastore-overwrites-lba:
-    cluster:
-      source_directory: /home/sjust/baseline-with-lba
-      osd_options:
-        seastore_main_device_type: RANDOM_BLOCK_SSD
-#        seastore_obj_data_write_amplification: 1000000
-        seastore_data_delta_based_overwrite: 1000000
   rbm-seastore-overwrites:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
-#        seastore_obj_data_write_amplification: 1000000
         seastore_data_delta_based_overwrite: 1000000
   rbm-seastore-overwrites-no-delta:
     cluster:
       source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        seastore_main_device_type: RANDOM_BLOCK_SSD
