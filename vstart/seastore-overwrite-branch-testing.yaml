@@ -41,7 +41,9 @@ base:
   - type: perf
 #  - type: counters
 overrides:
-  rbm-seastore-overwrites:
+  rbm-seastore-overwrites-narrow-journal:
+    osd_options:
+      seastore_journal_iodepth_limit: 2
   rbm-seastore-overwrites-wider-journal:
     osd_options:
-      seastore_journal_iodepth_limit: 15
+      seastore_journal_iodepth_limit: 16
