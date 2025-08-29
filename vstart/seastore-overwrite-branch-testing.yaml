@@ -42,7 +42,7 @@ base:
 #  - type: perf
   - type: counters
 overrides:
-  rbm-seastore-overwritesk: {}
+  rbm-seastore-overwrites:
   rbm-seastore-overwrites-min-flush:
     osd_options:
       seastore_journal_batch_busy_min_flush_size: 16K
