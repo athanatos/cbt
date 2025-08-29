@@ -39,7 +39,7 @@ base:
       time_based: 1
   perfmonitors:
   - type: perf
-  - type: counters
+#  - type: counters
 overrides:
   rbm-seastore-overwrites:
   rbm-seastore-overwrites-wider-journal:
