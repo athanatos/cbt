@@ -5,7 +5,7 @@ base:
     crimson: true
     seastore: true
     crimson_balance_cpu: none
-    osd_cores: 16
+    osd_cores: 8
     type: vstart
     osd_devices:
     - /dev/nvme4n1
