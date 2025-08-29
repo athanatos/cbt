@@ -16,9 +16,12 @@ base:
     - /dev/nvme2n1
     - /dev/nvme3n1
     num_osds: 1
+    source_directory: /home/sjust/wip-crimson-perf
     osd_options:
       seastore_max_concurrent_transactions: 128
       seastore_cachepin_size_pershard: 2G
+      seastore_main_device_type: RANDOM_BLOCK_SSD
+      seastore_data_delta_based_overwrite: 1000000
   workload:
     taskset: '1-32:2'
     type: fio_rbd
@@ -39,11 +42,6 @@ base:
   - type: counters
 overrides:
   rbm-seastore-overwrites:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-perf
-      osd_options:
-        seastore_main_device_type: RANDOM_BLOCK_SSD
-        seastore_data_delta_based_overwrite: 1000000
-  rbm-seastore-overwrites-no-delta:
-    cluster:
-      source_directory: /home/sjust/wip-crimson-perf
+  rbm-seastore-overwrites-wider-journal:
+    osd_options:
+      seastore_journal_iodepth_limit: 15
