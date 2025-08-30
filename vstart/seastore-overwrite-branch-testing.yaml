@@ -44,5 +44,6 @@ base:
 overrides:
   rbm-seastore-overwrites:
   rbm-seastore-overwrites-min-flush:
-    osd_options:
-      seastore_journal_batch_busy_min_flush_size: 16K
+    cluster:
+      osd_options:
+        seastore_journal_batch_busy_min_flush_size: 16K
