@@ -1,4 +1,3 @@
-# test converting all assert to ceph_assert
 base:
   cluster:
     taskset: '0-31:2'
@@ -21,7 +20,7 @@ base:
       seastore_max_concurrent_transactions: 128
       seastore_cachepin_size_pershard: 2G
       seastore_main_device_type: RANDOM_BLOCK_SSD
-      seastore_data_delta_based_overwrite: 1000000
+      #seastore_data_delta_based_overwrite: 1000000
       seastore_journal_iodepth_limit: 8
   workload:
     taskset: '1-32:2'

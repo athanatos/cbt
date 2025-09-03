@@ -13,6 +13,7 @@ from subprocess import Popen, PIPE
 import logging
 import sys
 import time
+import itertools
 
 """
 General tool for running short tests against single vstart OSDs
@@ -652,6 +653,8 @@ class PerfMonitor:
             return Perf(confcopy, *args)
         elif wtype == 'counters':
             return Counters(confcopy, *args)
+        elif wtype == 'iostat':
+            return IOStat(confcopy, *args)
         else:
             raise Exception(f"unrecognized cluster.type {wtype}")
 
@@ -705,6 +708,102 @@ class Counters(PerfMonitor):
         self.handle = handle
         self.output_path = output_path
         self.name = name
+        set_attr_from_config(
+            self,
+            {
+                'summary_profile': 'random_block_manager_default',
+            },
+            conf)
+
+        if self.summary_profile == 'random_block_manager_default':
+            self.summarize = [
+                'seastore_cbj_submit_record_latency_average_s',
+                'seastore_cbj_submit_record_wait_latency_average_s',
+                'seastore_cbj_submit_record_roll_latency_average_s',
+                'seastore_cbj_submit_record_size_average',
+                ('journal_records_per_io', lambda x, y: x / y,
+                 'journal_record_num', 'journal_io_num'),
+                ('journal_average_io_depth', lambda x, y: x / y,
+                 'journal_io_depth_num', 'journal_io_num')
+            ]
+            self.collapse = set([
+                'shard',
+                'osd'
+            ])
+        else:
+            self.summarize = None
+
+        if self.summarize is not None:
+            self.summary_metric_names = self.get_summary_metric_names()
+            self.logger.info(f"summary_metric_names: {self.summary_metric_names}")
+
+    def get_summary_metric_names(self):
+        assert(self.summarize is not None)
+        ret = set()
+        for entry in self.summarize:
+            if type(entry) == tuple:
+                (name, func, e1, e2) = entry
+                ret |= set([e1, e2])
+            else:
+                ret |= set([entry])
+        return ret
+
+    def filter_map_metrics(self, osd, metrics):
+        ret = []
+        for metric in metrics:
+            assert(len(metric) == 1)
+            name, values = list(metric.items())[0]
+            if name not in self.summary_metric_names:
+                continue
+
+
+    class ScalarMetricGroup:
+        def __init__(self, metric_name, param_names, to_collapse):
+            self.logger = logger.getChild(type(self).__name__)
+            assert('shard' in param_names)
+            assert('value' in param_names)
+            self.__metric = metric_name
+            self.__param_name_tuple = self.param_names_to_tuple(to_collapse, param_names)
+            self.__values = {}
+
+        def param_names_to_tuple(self, to_collapse, param_names):
+            assert('shard' in param_names)
+            assert('value' in param_names)
+            param_name_set = set(param_names) - to_collapse - set(["value"])
+            return tuple(sorted(param_name_set))
+
+        def to_param_tuple(self, params):
+            return tuple((params[name] for name in self.__param_name_tuple))
+
+        def to_param_dict(self, param_tuple, value):
+            assert(len(self.__param_name_tuple) == len(param_tuple))
+            return dict(
+                list(zip(self.__param_name_tuple, param_tuple)) +
+                [('value', value)]
+            )
+
+        def add_value(self, params):
+            logger = self.logger.getChild("add_value")
+            logger.info(f"name: {self.__metric}, params: {params}")
+            assert('shard' in params)
+            assert('value' in params)
+            assert('osd' in params)
+            key = self.to_param_tuple(params)
+            if key not in self.__values:
+                self.__values[key] = 0
+            to_add = params['value']
+            logger.info(f"adding {to_add} to {key}")
+            if to_add is not None:
+                self.__values[key] += to_add
+
+        def to_list(self):
+            logger = self.logger.getChild("to_list")
+            ret = [
+                self.to_param_dict(k, v)
+                for k, v in self.__values.items()
+            ]
+            logger.info(f"name: {self.__metric}, params: {ret}")
+            return ret
 
     def get_filename(self):
         return os.path.join(
@@ -712,21 +811,82 @@ class Counters(PerfMonitor):
             f"{self.name}-counters.yaml")
 
     def start(self):
-        ret = []
+        # only used for metric summary
+        metric_groups = {}
+        for_file = []
+        logger = self.logger.getChild('start')
         for osd in self.handle.get_osds():
-            self.logger.getChild('start').info(
-                f"about to dump metrics for osd {osd}")
+            logger.info(f"about to dump metrics for osd {osd}")
             val = {'osd': osd}
             val['perfcounters_dump'] = self.handle.run_osd_asok_decode(
                 osd, ['perfcounters_dump'])
-            val['dump_metrics'] = self.handle.run_osd_asok_decode(
+            dump_metrics = self.handle.run_osd_asok_decode(
                 osd, ['dump_metrics'])
-            ret.append(val)
+            logger.info(f"dump_metrics complete on osd {osd}")
+            val['dump_metrics'] = dump_metrics
+            for_file.append(val)
+
+            logger.info(f"about to summarize metrics for osd {osd}")
+            if self.summarize is not None:
+                for metric in dump_metrics['metrics']:
+                    assert(len(metric) == 1)
+                    name, params = list(metric.items())[0]
+                    assert('value' in params)
+                    # skip histograms for now
+                    if type(params['value']) is dict:
+                        logger.info(f"metric {name} value is dict")
+                        continue
+                    if name not in self.summary_metric_names:
+                        logger.info(f"metric {name} not in {self.summary_metric_names}")
+                        continue
+                    logger.info(f"adding metric {name} for osd {osd}")
+                    if name not in metric_groups:
+                        metric_groups[name] = self.ScalarMetricGroup(
+                            name, params.keys(), self.collapse
+                        )
+                    metric_groups[name].add_value(params | { 'osd' : osd })
+
         with open(self.get_filename(), 'w') as f:
-            f.write(yaml.dump(ret))
+            f.write(yaml.dump(for_file))
+
+        if self.summarize is not None:
+            logger.info(f"metric_groups.items(): {list(metric_groups.keys())}")
+            self.ret = [
+                {name: y} for name, x in metric_groups.items() for y in x.to_list()
+            ]
+            logger.info(f"self.ret: {self.ret}")
 
     def join(self):
-        pass
+        return self.ret
+
+
+class IOStat(PerfMonitor):
+    """
+    perfmonitors:
+    - type: counters
+    """
+    def __init__(self, conf, handle, output_path, name):
+        self.logger = logger.getChild(type(self).__name__)
+        self.conf = conf
+        self.handle = handle
+        self.output_path = output_path
+        self.name = name
+
+    def get_filename(self):
+        return os.path.join(
+            self.output_path,
+            f"{self.name}-counters.yaml")
+
+    def start(self):
+        args = ['iostat', '-o', 'JSON']
+        self.process = subprocess.Popen(
+            args,
+            cwd = self.output_path)
+
+    def join(self):
+        self.process.wait(10)
+        return yaml.safe_load(self.process.stdout)
+
 
 def main():
     kill_test_procs()
@@ -742,13 +902,16 @@ def main():
     parser.add_argument(
         '-p', '--perf-dir', help='path for perf output', required=False
     )
+    parser.add_argument(
+        '-v', '--verbose', help='include unsummarized output', required=False
+    )
     args = parser.parse_args()
 
     if not args.output and args.perf_dir:
         args.output = os.path.join(args.perf_dir, 'summary.yaml')
 
     if args.perf_dir:
-        os.mkdir(args.perf_dir)
+        os.makedirs(args.perf_dir)
 
     outputs = []
     for name, override, base, config in read_configs(args.config):
@@ -771,16 +934,22 @@ def main():
         for perfmonitor in perfmonitors:
             perfmonitor.start()
         time.sleep(max(0, est_completion - time.monotonic()))
+
+        perfmonitor_summaries = {}
         for perfmonitor in perfmonitors:
-            perfmonitor.join()
+            ret = perfmonitor.join()
+            if ret is not None:
+                perfmonitor_summaries[perfmonitor.name] = ret
 
         workload.join()
 
         cluster.stop()
         output['name'] = name
         output['cluster'] = cluster.get_output()
-        output['workload_raw'] = workload.get_output()
+        if args.verbose:
+            output['workload_raw'] = workload.get_output()
         output['workload_summary'] = workload.get_summary()
+        output['perfmonitor_summaries'] = perfmonitor_summaries
         outputs.append(output)
     results = yaml.dump(outputs)
     print(results)
