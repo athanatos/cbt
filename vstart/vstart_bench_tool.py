@@ -961,7 +961,7 @@ class IOStat(PerfMonitor):
     def start(self):
         args = [
             'iostat', '-o', 'JSON',
-            '-z', '-y', '5', '1'
+            '-d', '-z', '-y', '5', '1'
         ]
         self.proc = subprocess.Popen(
             args, stdout=subprocess.PIPE)
@@ -969,7 +969,7 @@ class IOStat(PerfMonitor):
     def join(self):
         ret = yaml.safe_load(
             str(self.proc.stdout.read(), 'utf-8').replace('\t', ' ')
-        )
+        )['sysstat']['hosts'][0]['statistics'][0]
         self.proc.wait()
         return ret
 
