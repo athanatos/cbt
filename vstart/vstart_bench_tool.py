@@ -959,16 +959,19 @@ class IOStat(PerfMonitor):
             f"{self.name}-counters.yaml")
 
     def start(self):
-        self.ret = yaml.safe_load(
-            str(
-                subprocess.check_output(['iostat', '-o', 'JSON']), 'utf-8'
-            ).replace('\t', ' ')
-        )
-        self.logger.getChild("start").info(
-            f"iostat complete: {self.ret}")
+        args = [
+            'iostat', '-o', 'JSON',
+            '-y', '2', '2'
+        ]
+        self.proc = subprocess.Popen(
+            args, stdout=subprocess.PIPE)
 
     def join(self):
-        return self.ret
+        ret = yaml.safe_load(
+            str(self.proc.stdout.read(), 'utf-8').replace('\t', ' ')
+        )
+        self.proc.wait()
+        return ret
 
 
 def main():
