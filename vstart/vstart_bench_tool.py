@@ -964,7 +964,7 @@ class IOStat(PerfMonitor):
                 subprocess.check_output(['iostat', '-o', 'JSON']), 'utf-8'
             ).replace('\t', ' ')
         )
-        self.logger.get_child("start").info(
+        self.logger.getChild("start").info(
             f"iostat complete: {self.ret}")
 
     def join(self):
