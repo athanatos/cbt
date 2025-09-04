@@ -962,7 +962,8 @@ class IOStat(PerfMonitor):
         args = ['iostat', '-o', 'JSON']
         self.process = subprocess.Popen(
             args,
-            cwd = self.output_path)
+            cwd = self.output_path,
+            stdout = subprocess.PIPE)
 
     def join(self):
         ret = yaml.safe_load(self.process.stdout)
