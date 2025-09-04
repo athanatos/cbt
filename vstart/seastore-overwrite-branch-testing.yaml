@@ -20,8 +20,7 @@ base:
       seastore_max_concurrent_transactions: 128
       seastore_cachepin_size_pershard: 2G
       seastore_main_device_type: RANDOM_BLOCK_SSD
-      #seastore_data_delta_based_overwrite: 1000000
-      seastore_journal_iodepth_limit: 8
+      seastore_journal_batch_busy_min_flush_size: 8K
   workload:
     taskset: '1-32:2'
     type: fio_rbd
@@ -45,4 +44,4 @@ overrides:
   rbm-seastore-overwrites-min-flush:
     cluster:
       osd_options:
-        seastore_journal_batch_busy_min_flush_size: 16K
+        seastore_main_device_type: RANDOM_BLOCK_SSD
