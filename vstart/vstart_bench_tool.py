@@ -1022,7 +1022,7 @@ def main():
         for perfmonitor in perfmonitors:
             ret = perfmonitor.join()
             if ret is not None:
-                perfmonitor_summaries[perfmonitor.name] = ret
+                perfmonitor_summaries[type(perfmonitor).__name__] = ret
 
         workload.join()
 
