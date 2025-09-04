@@ -965,8 +965,9 @@ class IOStat(PerfMonitor):
             cwd = self.output_path)
 
     def join(self):
-        self.process.wait(10)
-        return yaml.safe_load(self.process.stdout)
+        ret = yaml.safe_load(self.process.stdout)
+        self.process.wait()
+        return ret
 
 
 def main():
