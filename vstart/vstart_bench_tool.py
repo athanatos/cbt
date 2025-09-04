@@ -735,6 +735,12 @@ class Counters(PerfMonitor):
         if self.summary_profile == 'random_block_manager_default':
             self.summarize = [
                 'reactor_utilization',
+                ('write_record_latency', safe_div, 
+                 'seastore_cbj_write_total_s',
+                 'seastore_cbj_write_count'),
+                ('write_record_size', safe_div, 
+                 'seastore_cbj_write_size_total',
+                 'seastore_cbj_write_count'),
                 ('submit_record_latency', safe_div,
                  'seastore_cbj_submit_record_latency_total_s',
                  'seastore_cbj_submit_record_count'),
