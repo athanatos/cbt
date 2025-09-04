@@ -960,9 +960,12 @@ class IOStat(PerfMonitor):
 
     def start(self):
         self.ret = yaml.safe_load(
-            str(subprocess.check_output(['iostat', '-o', 'JSON']).strip(),
-                'utf-8').replace('\t', ' ')
+            str(
+                subprocess.check_output(['iostat', '-o', 'JSON']), 'utf-8'
+            ).replace('\t', ' ')
         )
+        self.logger.get_child("start").info(
+            f"iostat complete: {self.ret}")
 
     def join(self):
         return self.ret
