@@ -697,6 +697,23 @@ class Perf(PerfMonitor):
             proc.wait(10)
 
 
+def safe_div(x, y):
+    if y == 0:
+        return None
+    return x / y
+
+
+def get_collapser(name):
+    collapser = {
+        'reactor_utilization': statistics.mean
+    }.get(name, sum)
+    def ret(vals):
+        if None in vals:
+            return None
+        return collapser(vals)
+    return ret
+
+
 class Counters(PerfMonitor):
     """
     perfmonitors:
@@ -717,13 +734,22 @@ class Counters(PerfMonitor):
 
         if self.summary_profile == 'random_block_manager_default':
             self.summarize = [
-                'seastore_cbj_submit_record_latency_average_s',
-                'seastore_cbj_submit_record_wait_latency_average_s',
-                'seastore_cbj_submit_record_roll_latency_average_s',
-                'seastore_cbj_submit_record_size_average',
-                ('journal_records_per_io', lambda x, y: x / y,
+                'reactor_utilization',
+                ('submit_record_latency', safe_div,
+                 'seastore_cbj_submit_record_latency_total_s',
+                 'seastore_cbj_submit_record_count'),
+                ('submit_record_wait_latency', safe_div,
+                 'seastore_cbj_submit_record_wait_latency_total_s',
+                 'seastore_cbj_submit_record_count'),
+                ('submit_record_roll_latency', safe_div,
+                 'seastore_cbj_submit_record_roll_latency_total_s',
+                 'seastore_cbj_submit_record_count'),
+                ('submit_record_size_average', safe_div,
+                 'seastore_cbj_submit_record_size_total',
+                 'seastore_cbj_submit_record_count'),
+                ('journal_records_per_io', safe_div,
                  'journal_record_num', 'journal_io_num'),
-                ('journal_average_io_depth', lambda x, y: x / y,
+                ('journal_average_io_depth', safe_div,
                  'journal_io_depth_num', 'journal_io_num')
             ]
             self.collapse = set([
@@ -766,6 +792,12 @@ class Counters(PerfMonitor):
             self.__param_name_tuple = self.param_names_to_tuple(to_collapse, param_names)
             self.__values = {}
 
+        def get_param_name_tuple(self):
+            return self.__param_name_tuple
+
+        def get_params(self):
+            return list(self.__values.keys())
+
         def param_names_to_tuple(self, to_collapse, param_names):
             assert('shard' in param_names)
             assert('value' in param_names)
@@ -790,16 +822,15 @@ class Counters(PerfMonitor):
             assert('osd' in params)
             key = self.to_param_tuple(params)
             if key not in self.__values:
-                self.__values[key] = 0
+                self.__values[key] = []
             to_add = params['value']
             logger.info(f"adding {to_add} to {key}")
-            if to_add is not None:
-                self.__values[key] += to_add
+            self.__values[key].append(to_add)
 
         def to_list(self):
             logger = self.logger.getChild("to_list")
             ret = [
-                self.to_param_dict(k, v)
+                self.to_param_dict(k, get_collapser(self.__metric)(v))
                 for k, v in self.__values.items()
             ]
             logger.info(f"name: {self.__metric}, params: {ret}")
@@ -809,6 +840,53 @@ class Counters(PerfMonitor):
         return os.path.join(
             self.output_path,
             f"{self.name}-counters.yaml")
+
+    def build_summary(self, metric_groups):
+        logger = self.logger.getChild("build_summary")
+        ret = []
+        for m in self.summarize:
+            if type(m) == str:
+                if m not in metric_groups:
+                    logger.error(
+                        f"metric {m} not found in " +
+                        f"metric_groups: {metric_groups.keys()}")
+                    continue
+                ret += [{m: y} for y in metric_groups[m].to_list()]
+            elif type(m) == tuple:
+                name, f, m1, m2 = m
+                if m1 not in metric_groups:
+                    logger.error(
+                        f"metric {m1} not found in " +
+                        f"metric_groups: {metric_groups.keys()}")
+                    continue
+                if m2 not in metric_groups:
+                    logger.error(
+                        f"metric {m2} not found in " +
+                        f"metric_groups: {metric_groups.keys()}")
+                    continue
+                smg1 = metric_groups[m1]
+                smg2 = metric_groups[m2]
+                if smg1.get_param_name_tuple() != smg2.get_param_name_tuple():
+                    logger.error(
+                        f"metric {m1} params {smg1.get_param_name_tuple()} " +
+                        f"does not match " +
+                        f"metric {m2} params {smg2.get_param_name_tuple()} ")
+                    continue
+                if list(smg1.get_params()) != \
+                   list(smg2.get_params()):
+                    logger.error(
+                        f"metric {m1} keys {smg1.get_params()} " +
+                        f"does not match " +
+                        f"metric {m2} keys {smg2.get_params()} ")
+                    continue
+                for m1p, m2p in zip(smg1.to_list(), smg2.to_list()):
+                    assert(list(m1p.keys()) == list(m2p.keys()))
+                    params = m1p.copy()
+                    params['value'] = f(m1p['value'], m2p['value'])
+                    ret.append({name: params})
+        return ret
+
+
 
     def start(self):
         # only used for metric summary
@@ -837,7 +915,6 @@ class Counters(PerfMonitor):
                         logger.info(f"metric {name} value is dict")
                         continue
                     if name not in self.summary_metric_names:
-                        logger.info(f"metric {name} not in {self.summary_metric_names}")
                         continue
                     logger.info(f"adding metric {name} for osd {osd}")
                     if name not in metric_groups:
@@ -851,9 +928,7 @@ class Counters(PerfMonitor):
 
         if self.summarize is not None:
             logger.info(f"metric_groups.items(): {list(metric_groups.keys())}")
-            self.ret = [
-                {name: y} for name, x in metric_groups.items() for y in x.to_list()
-            ]
+            self.ret = self.build_summary(metric_groups)
             logger.info(f"self.ret: {self.ret}")
 
     def join(self):
