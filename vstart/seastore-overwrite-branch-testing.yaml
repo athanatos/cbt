@@ -38,7 +38,7 @@ base:
       runtime: 100
       time_based: 1
   perfmonitors:
-#  - type: perf
+  - type: iostat
   - type: counters
 overrides:
   rbm-seastore-overwrites:
