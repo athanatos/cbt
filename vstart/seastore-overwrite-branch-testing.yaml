@@ -20,7 +20,6 @@ base:
       seastore_max_concurrent_transactions: 128
       seastore_cachepin_size_pershard: 2G
       seastore_journal_batch_busy_min_flush_size: 8K
-      crimson_reactor_io_latency_goal_ms: 10
   workload:
     taskset: '1-32:2'
     type: fio_rbd
