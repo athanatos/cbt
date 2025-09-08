@@ -756,7 +756,14 @@ class Counters(PerfMonitor):
                 ('journal_records_per_io', safe_div,
                  'journal_record_num', 'journal_io_num'),
                 ('journal_average_io_depth', safe_div,
-                 'journal_io_depth_num', 'journal_io_num')
+                 'journal_io_depth_num', 'journal_io_num'),
+                ('nbd_average_latency', safe_div,
+                 'seastore_nbd_write_latency_average_s',
+                 'seastore_nbd_write_count'),
+                ('nbd_average_io_depth', safe_div,
+                 'seastore_nbd_write_io_depth_total',
+                 'seastore_nbd_write_count'),
+                'seastore_nbd_nvme_write_count'
             ]
             self.collapse = set([
                 'shard',
