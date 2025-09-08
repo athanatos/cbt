@@ -40,7 +40,6 @@ base:
   - type: counters
 overrides:
   rbm-seastore-overwrites:
-  rbm-seastore-overwrites-min-flush:
     cluster:
       osd_options:
         seastore_main_device_type: RANDOM_BLOCK_SSD
