@@ -1033,6 +1033,8 @@ def main():
         ]
         if perfmonitors and not args.perf_dir:
             raise Exception("Must specify -p, --perf-dir for PerfMonitors")
+
+        time.sleep(max(0, est_completion - time.monotonic()) / 2)
         for perfmonitor in perfmonitors:
             perfmonitor.start()
         time.sleep(max(0, est_completion - time.monotonic()))
