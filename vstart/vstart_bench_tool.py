@@ -714,6 +714,26 @@ def get_collapser(name):
     return ret
 
 
+def get_op_stat_summary_definitions(group):
+    return [
+        (f'{group}_op_average_latency', safe_div,
+         f'{group}_op_latency_total_s',
+         f'{group}_op_count'),
+        (f'{group}_op_queue_depth_average', safe_div,
+         f'{group}_op_queue_depth_total',
+         f'{group}_op_count'),
+        (f'{group}_op_rate', safe_div,
+         f'{group}_op_count',
+         f'{group}_measurement_duration'),
+        (f'{group}_idle_ratio', safe_div,
+         f'{group}_idle_time',
+         f'{group}_measurement_duration'),
+        (f'{group}_busy_ratio', safe_div,
+         f'{group}_busy_time',
+         f'{group}_measurement_duration')
+    ]
+
+
 class Counters(PerfMonitor):
     """
     perfmonitors:
@@ -757,23 +777,7 @@ class Counters(PerfMonitor):
                  'journal_record_num', 'journal_io_num'),
                 ('journal_average_io_depth', safe_div,
                  'journal_io_depth_num', 'journal_io_num'),
-                ('nbd_average_latency', safe_div,
-                 'seastore_nbd_write_latency_total_s',
-                 'seastore_nbd_write_count'),
-                ('nbd_average_io_depth', safe_div,
-                 'seastore_nbd_write_io_depth_total',
-                 'seastore_nbd_write_count'),
-                ('nbd_write_rate', safe_div,
-                 'seastore_nbd_write_count',
-                 'seastore_nbd_write_io_record_time'),
-                ('nbd_idle_ratio', safe_div,
-                 'seastore_nbd_write_io_idle_time',
-                 'seastore_nbd_write_io_record_time'),
-                ('nbd_busy_ratio', safe_div,
-                 'seastore_nbd_write_io_busy_time',
-                 'seastore_nbd_write_io_record_time'),
-                'seastore_nbd_write_count'
-            ]
+            ] + get_op_stat_summary_definitions("seastore_nbd_write")
             self.collapse = set([
                 'shard',
                 'osd'
