@@ -765,13 +765,13 @@ class Counters(PerfMonitor):
                  'seastore_nbd_write_count'),
                 ('nbd_write_rate', safe_div,
                  'seastore_nbd_write_count',
-                 'seastore_nbd_record_time'),
+                 'seastore_nbd_write_io_record_time'),
                 ('nbd_idle_ratio', safe_div,
-                 'seastore_nbd_idle_time',
-                 'seastore_nbd_record_time'),
+                 'seastore_nbd_write_io_idle_time',
+                 'seastore_nbd_write_io_record_time'),
                 ('nbd_busy_ratio', safe_div,
-                 'seastore_nbd_busy_time',
-                 'seastore_nbd_record_time'),
+                 'seastore_nbd_write_io_busy_time',
+                 'seastore_nbd_write_io_record_time'),
                 'seastore_nbd_write_count'
             ]
             self.collapse = set([
