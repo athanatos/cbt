@@ -777,7 +777,15 @@ class Counters(PerfMonitor):
                  'journal_record_num', 'journal_io_num'),
                 ('journal_average_io_depth', safe_div,
                  'journal_io_depth_num', 'journal_io_num'),
-            ] + get_op_stat_summary_definitions("seastore_nbd_write")
+            ]
+            self.summarize += get_op_stat_summary_definitions(
+                "seastore_nbd_write")
+            self.summarize += get_op_stat_summary_definitions(
+                "seastore_cbj")
+            self.summarize += get_op_stat_summary_definitions(
+                "seastore_cjs")
+            
+            
             self.collapse = set([
                 'shard',
                 'osd'
