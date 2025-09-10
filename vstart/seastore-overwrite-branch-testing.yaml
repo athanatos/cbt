@@ -42,4 +42,4 @@ overrides:
   rbm:
     cluster:
       osd_options:
-	seastore_main_device_type: RANDOM_BLOCK_SSD
+        seastore_main_device_type: RANDOM_BLOCK_SSD
