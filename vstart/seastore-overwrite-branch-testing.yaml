@@ -40,12 +40,9 @@ base:
   - type: iostat
   - type: counters
 overrides:
+  64:
+    workload:
+      num_pgs: 64
   128:
     workload:
       num_pgs: 128
-  512:
-    workload:
-      num_pgs: 512
-  2048:
-    workload:
-      num_pgs: 2048
