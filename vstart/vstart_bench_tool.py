@@ -784,6 +784,8 @@ class Counters(PerfMonitor):
                 "seastore_cbj")
             self.summarize += get_op_stat_summary_definitions(
                 "seastore_cjs")
+            self.summarize += get_op_stat_summary_definitions(
+                "seastore_tm_st")
             
             
             self.collapse = set([
