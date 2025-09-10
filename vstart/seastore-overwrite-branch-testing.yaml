@@ -19,7 +19,6 @@ base:
     osd_options:
       seastore_max_concurrent_transactions: 128
       seastore_cachepin_size_pershard: 2G
-      seastore_journal_batch_busy_min_flush_size: 8K
       seastore_main_device_type: RANDOM_BLOCK_SSD
   workload:
     taskset: '1-32:2'
@@ -27,7 +26,7 @@ base:
     pool_size: 1
     rbd_size: 1G
     rbd_prefill_size: 4K
-    num_pgs: 2048
+    num_pgs: 64
     num_clients: 32
     fio_args:
       iodepth: 32
@@ -40,9 +39,8 @@ base:
   - type: iostat
   - type: counters
 overrides:
-  64:
-    workload:
-      num_pgs: 64
-  128:
-    workload:
-      num_pgs: 128
+  with-min-flush:
+    cluster:
+      osd_options:
+        seastore_journal_batch_busy_min_flush_size: 8K
+  without-min-flush:
