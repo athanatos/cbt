@@ -39,8 +39,7 @@ base:
   - type: iostat
   - type: counters
 overrides:
-  with-min-flush:
-    cluster:
-      osd_options:
-        seastore_journal_batch_busy_min_flush_size: 8K
   without-min-flush:
+  classic:
+    cluster:
+      crimson: false

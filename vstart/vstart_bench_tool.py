@@ -991,7 +991,7 @@ class IOStat(PerfMonitor):
     def start(self):
         args = [
             'iostat', '-o', 'JSON',
-            '-x', '-d', '-z', '-y', '5', '1'
+            '-x', '-d', '-z', '-y', '10', '1'
         ]
         self.proc = subprocess.Popen(
             args, stdout=subprocess.PIPE)
