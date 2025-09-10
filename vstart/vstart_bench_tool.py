@@ -941,10 +941,9 @@ class Counters(PerfMonitor):
                 osd, ['perfcounters_dump'])
             dump_metrics = {}
             if self.handle.is_crimson():
-                self.handle.run_osd_asok_decode(
+                dump_metrics = self.handle.run_osd_asok_decode(
                     osd, ['dump_metrics'])
                 logger.info(f"dump_metrics complete on osd {osd}")
-                val['dump_metrics'] = dump_metrics
                 logger.info(f"about to summarize metrics for osd {osd}")
                 if self.summarize is not None:
                     for metric in dump_metrics['metrics']:
@@ -963,6 +962,7 @@ class Counters(PerfMonitor):
                                 name, params.keys(), self.collapse
                             )
                         metric_groups[name].add_value(params | { 'osd' : osd })
+            val['dump_metrics'] = dump_metrics
             for_file.append(val)
 
 
