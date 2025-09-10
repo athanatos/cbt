@@ -41,11 +41,11 @@ base:
   - type: counters
 overrides:
   128:
-    workload
+    workload:
       num_pgs: 128
   512:
-    workload
+    workload:
       num_pgs: 512
   2048:
-    workload
+    workload:
       num_pgs: 2048
