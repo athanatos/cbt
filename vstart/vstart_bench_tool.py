@@ -119,6 +119,8 @@ class Cluster:
             raise Exception(f"unrecognized cluster.type {ctype}")
 
     class Handle:
+        def is_crimson(self): pass
+
         def get_conf_directory(self): pass
 
         def get_bin_directory(self): pass
@@ -276,6 +278,9 @@ class VStartCluster(Cluster):
         def __init__(self, parent):
             self.logger = logger.getChild(f"{type(parent).__name__}.{type(self).__name__}")
             self.parent = parent
+
+        def is_crimson(self):
+            return self.parent.crimson
 
         def get_conf_directory(self):
             return self.parent.build_directory
@@ -934,30 +939,32 @@ class Counters(PerfMonitor):
             val = {'osd': osd}
             val['perfcounters_dump'] = self.handle.run_osd_asok_decode(
                 osd, ['perfcounters_dump'])
-            dump_metrics = self.handle.run_osd_asok_decode(
-                osd, ['dump_metrics'])
-            logger.info(f"dump_metrics complete on osd {osd}")
-            val['dump_metrics'] = dump_metrics
+            dump_metrics = {}
+            if self.handle.is_crimson():
+                self.handle.run_osd_asok_decode(
+                    osd, ['dump_metrics'])
+                logger.info(f"dump_metrics complete on osd {osd}")
+                val['dump_metrics'] = dump_metrics
+                logger.info(f"about to summarize metrics for osd {osd}")
+                if self.summarize is not None:
+                    for metric in dump_metrics['metrics']:
+                        assert(len(metric) == 1)
+                        name, params = list(metric.items())[0]
+                        assert('value' in params)
+                        # skip histograms for now
+                        if type(params['value']) is dict:
+                            logger.info(f"metric {name} value is dict")
+                            continue
+                        if name not in self.summary_metric_names:
+                            continue
+                        logger.info(f"adding metric {name} for osd {osd}")
+                        if name not in metric_groups:
+                            metric_groups[name] = self.ScalarMetricGroup(
+                                name, params.keys(), self.collapse
+                            )
+                        metric_groups[name].add_value(params | { 'osd' : osd })
             for_file.append(val)
 
-            logger.info(f"about to summarize metrics for osd {osd}")
-            if self.summarize is not None:
-                for metric in dump_metrics['metrics']:
-                    assert(len(metric) == 1)
-                    name, params = list(metric.items())[0]
-                    assert('value' in params)
-                    # skip histograms for now
-                    if type(params['value']) is dict:
-                        logger.info(f"metric {name} value is dict")
-                        continue
-                    if name not in self.summary_metric_names:
-                        continue
-                    logger.info(f"adding metric {name} for osd {osd}")
-                    if name not in metric_groups:
-                        metric_groups[name] = self.ScalarMetricGroup(
-                            name, params.keys(), self.collapse
-                        )
-                    metric_groups[name].add_value(params | { 'osd' : osd })
 
         with open(self.get_filename(), 'w') as f:
             f.write(yaml.dump(for_file))
