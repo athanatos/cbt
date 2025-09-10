@@ -39,15 +39,11 @@ base:
   - type: iostat
   - type: counters
 overrides:
+  rbm-4:
+    cluster:
+      osd_options:
+        seastore_max_concurrent_transactions: 4
   rbm-8:
     cluster:
       osd_options:
         seastore_max_concurrent_transactions: 8
-  rbm-32:
-    cluster:
-      osd_options:
-        seastore_max_concurrent_transactions: 32
-  rbm-128:
-    cluster:
-      osd_options:
-        seastore_max_concurrent_transactions: 128
