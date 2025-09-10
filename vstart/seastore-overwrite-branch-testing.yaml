@@ -19,7 +19,6 @@ base:
     osd_options:
       seastore_max_concurrent_transactions: 128
       seastore_cachepin_size_pershard: 2G
-      seastore_main_device_type: RANDOM_BLOCK_SSD
   workload:
     taskset: '1-32:2'
     type: fio_rbd
@@ -39,7 +38,8 @@ base:
   - type: iostat
   - type: counters
 overrides:
-  classic:
+  segmented:
+  rbm:
     cluster:
-      crimson: false
-  without-min-flush:
+      osd_options:
+	seastore_main_device_type: RANDOM_BLOCK_SSD
