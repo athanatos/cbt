@@ -739,6 +739,14 @@ def get_op_stat_summary_definitions(group):
     ]
 
 
+def get_op_retry_definitions(group):
+    return get_op_stat_summary_definitions(group) + [
+        (f'{group}_op_retry_ratio', safe_div,
+         f'{group}_op_retry_total',
+         f'{group}_op_count')
+    ]
+
+
 class Counters(PerfMonitor):
     """
     perfmonitors:
@@ -791,6 +799,8 @@ class Counters(PerfMonitor):
                 "seastore_cjs")
             self.summarize += get_op_stat_summary_definitions(
                 "seastore_tm_st")
+            self.summarize += get_op_retry_definitions(
+                "seastore_dt")
             
             
             self.collapse = set([
