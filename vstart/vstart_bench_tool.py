@@ -768,6 +768,7 @@ class Counters(PerfMonitor):
         if self.summary_profile == 'random_block_manager_default':
             self.summarize = [
                 'reactor_utilization',
+                'cache_trans_invalidated_by_extent',
                 ('write_record_latency', safe_div, 
                  'seastore_cbj_write_total_s',
                  'seastore_cbj_write_count'),
@@ -805,7 +806,8 @@ class Counters(PerfMonitor):
             
             self.collapse = set([
                 'shard',
-                'osd'
+                'osd',
+                'src'
             ])
         else:
             self.summarize = None
