@@ -43,7 +43,7 @@ overrides:
     cluster:
       osd_options:
         seastore_max_concurrent_transactions: 16
-  rbm-16:
+  rbm-64:
     cluster:
       osd_options:
         seastore_max_concurrent_transactions: 64
