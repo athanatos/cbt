@@ -1,0 +1,47 @@
+base:
+  cluster:
+    taskset: '0-31:2'
+    crimson: true
+    seastore: true
+    crimson_balance_cpu: none
+    osd_cores: 8
+    type: vstart
+    osd_devices:
+    - /dev/nvme4n1
+    - /dev/nvme5n1
+    - /dev/nvme6n1
+    - /dev/nvme7n1
+    - /dev/nvme1n1
+    - /dev/nvme2n1
+    - /dev/nvme3n1
+    num_osds: 1
+    source_directory: /home/sjust/wip-crimson-perf
+    osd_options:
+      seastore_max_concurrent_transactions: 16
+      seastore_cachepin_size_pershard: 2G
+      seastore_main_device_type: RANDOM_BLOCK_SSD
+  workload:
+    taskset: '1-32:2'
+    type: fio_rbd
+    pool_size: 1
+    rbd_size: 1G
+    rbd_prefill_size: 4K
+    num_pgs: 512
+    num_clients: 32
+    fio_args:
+      iodepth: 32
+      rw: randwrite
+      bs: 4096
+      numjobs: 4
+      runtime: 100
+      time_based: 1
+#  perfmonitors:
+#  - type: iostat
+#  - type: counters
+overrides:
+  baseline:
+    cluster:
+      source_directory: /home/sjust/baseline
+  cursor:
+    cluster:
+      source_directory: /home/sjust/seastore-conflict
